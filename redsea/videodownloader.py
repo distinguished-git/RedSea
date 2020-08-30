@@ -13,7 +13,7 @@ MP4Tags._padding = 0
 
 def parse_master_playlist(masterurl):
     content = str(requests.get(masterurl).content)
-    pattern = re.compile(r"(?<=RESOLUTION=).+?(?=\\n)")
+    pattern = re.compile(r"(?<=RESOLUTION=)[0-9]+x[0-9]+")
     resolution_list = pattern.findall(content)
     pattern = re.compile(r"(?<=http).+?(?=\\n)")
     plist = pattern.findall(content)
