@@ -264,12 +264,16 @@ class MediaDownloader(object):
                         album_cover = r.json()['results'][0]['artworkUrl100']
                         # Get high resolution album cover
 
+                        artwork_size = 1200
                         if 'artwork_size' in preset:
                             artwork_size = preset['artwork_size']
-                        else:
-                            artwork_size = 1200
+
+                        compressed = 'bb'
+                        if 'uncompressed_artwork' in preset:
+                            if preset['uncompressed_artwork']:
+                                compressed = '-999'
                         album_cover = album_cover.replace('100x100bb.jpg',
-                                                          '{}x{}bb.jpg'.format(artwork_size, artwork_size))
+                                                          '{}x{}{}.jpg'.format(artwork_size, artwork_size, compressed))
                         self._dl_url(album_cover, aa_location)
                     except:
                         print('\tDownloading album art from Tidal...')
