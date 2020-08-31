@@ -327,6 +327,10 @@ class TidalMobileSession(TidalSession):
             'email': self.username,
             'recaptchaResponse': ''
         })
+
+        if r.status_code == 401:
+            raise TidalAuthError('Recaptcha check is missing')
+
         assert (r.status_code == 200)
         if not r.json()['isValidEmail']:
             raise TidalAuthError('Invalid email')
