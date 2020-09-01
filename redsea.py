@@ -114,7 +114,6 @@ def main():
             print("The id " + str(id) + " could not be found!")
             exit()
 
-
     elif args.urls[0] == 'explore':
         if len(args.urls) == 3:
             if args.urls[1] == 'dolby' and args.urls[2] == 'atmos':
@@ -475,6 +474,12 @@ def main():
                                 # Let the user know we cannot download this release and skip it
                                 print('None of the available accounts were able to download track {}. Skipping..'.format(track['id']))
                                 break
+
+                        elif 'Please use a mobile session' in str(e):
+                            print(e)
+                            print('Choose one of the following mobile sessions: ')
+                            RSF.list_sessions(True)
+                            break
 
                         # Skip
                         else:

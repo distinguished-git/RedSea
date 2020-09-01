@@ -130,13 +130,14 @@ class RedseaSessionFile(TidalSessionFile):
                 if confirm.upper() == 'Y':
                     return False
 
-    def list_sessions(self):
+    def list_sessions(self, mobile_only=False):
         '''
         List all available sessions
         '''
 
-        if len(self.sessions) == 0:
-            confirm = input('No sessions found. Would you like to add one [Y/n]? ')
+        mobile_sessions = [isinstance(self.sessions[s], TidalMobileSession) for s in self.sessions]
+        if len(self.sessions) == 0 or (mobile_sessions.count(True) == 0 and mobile_only):
+            confirm = input('No (mobile) sessions found. Would you like to add one [Y/n]? ')
             if confirm.upper() == 'Y':
                 self.new_session()
             else:
@@ -146,10 +147,14 @@ class RedseaSessionFile(TidalSessionFile):
         for s in self.sessions:
             if isinstance(self.sessions[s], TidalMobileSession):
                 device = '[MOBILE]'
-            elif isinstance(self.sessions[s], TidalTvSession):
+            elif isinstance(self.sessions[s], TidalTvSession) and not mobile_only:
                 device = '[TV]'
             else:
                 device = ''
+
+            if mobile_only and isinstance(self.sessions[s], TidalTvSession):
+                continue
+
             print('   [{}]{} {} | {}'.format(self.sessions[s].country_code, device, self.sessions[s].username, s))
 
         print('')
