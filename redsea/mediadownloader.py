@@ -203,8 +203,10 @@ class MediaDownloader(object):
             playback_info = self.api.get_stream_url(track_id, preset['quality'])
             if 'manifestMimeType' in playback_info:
                 if playback_info['manifestMimeType'] == 'application/dash+xml':
-                    raise AssertionError('\tPlease use a mobile session for the track ' + str(playback_info['trackId']) +
-                                         '. This cannot be downloaded with a TV session.\n')
+                    raise AssertionError('\tPlease use a mobile session for the track ' + str(playback_info['trackId'])
+                                         + ' in ' + str(playback_info['audioQuality']) + ' audio quality. This cannot '
+                                                                                         'be downloaded with a TV '
+                                                                                         'session.\n')
 
             manifest = json.loads(base64.b64decode(playback_info['manifest']))
 

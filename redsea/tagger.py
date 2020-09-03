@@ -137,13 +137,14 @@ class Tagger(object):
             with open(album_art_path, 'rb') as f:
                 pic.data = f.read()
 
-            pic.type = PictureType.COVER_FRONT
-            pic.mime = u"image/jpeg"
-            # TODO: detect this automatically?
-            pic.width = 1280
-            pic.height = 1280
-            pic.depth = 24
-            tagger.add_picture(pic)
+            # Check if cover is smaller than 16MB
+            if len(pic.data) < pic.MAX_SIZE:
+                pic.type = PictureType.COVER_FRONT
+                pic.mime = u"image/jpeg"
+                tagger.add_picture(pic)
+            else:
+                print('\tCover file size is too large, only {0:.2f}MB are allowed.'.format(pic.MAX_SIZE / 1024 ** 2))
+                print('\tSet "artwork_size" to a lower value or disable "uncompressed_artwork" in config/settings.py')
 
         # Set lyrics from Deezer
         if lyrics:
