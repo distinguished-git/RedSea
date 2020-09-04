@@ -138,7 +138,7 @@ class Tagger(object):
                 pic.data = f.read()
 
             # Check if cover is smaller than 16MB
-            if len(pic.data) < pic.MAX_SIZE:
+            if len(pic.data) < pic._MAX_SIZE:
                 pic.type = PictureType.COVER_FRONT
                 pic.mime = u"image/jpeg"
                 tagger.add_picture(pic)
