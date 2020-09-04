@@ -68,16 +68,18 @@ class Tagger(object):
         if album_info is not None:
             # TODO: find a way to get numberOfTracks relative to the volume
             if track_type == 'm4a':
-                tagger['tracknumber'] = str(track_info['trackNumber']).zfill(2) + '/' + str(album_info['numberOfTracks'])
+                tagger['tracknumber'] = str(track_info['trackNumber']).zfill(2) + '/' + str(
+                    album_info['numberOfTracks'])
+                tagger['discnumber'] = str(
+                    track_info['volumeNumber']) + '/' + str(
+                    album_info['numberOfVolumes'])
             if track_type == 'flac':
                 tagger['discnumber'] = str(track_info['volumeNumber'])
                 tagger['totaldiscs'] = str(album_info['numberOfVolumes'])
                 tagger['tracknumber'] = str(track_info['trackNumber'])
                 tagger['totaltracks'] = str(album_info['numberOfTracks'])
             else:
-                tagger['discnumber'] = str(
-                    track_info['volumeNumber']) + '/' + str(
-                    album_info['numberOfVolumes'])
+                tagger['discnumber'] = str(track_info['volumeNumber'])
             if album_info['releaseDate']:
                 # TODO: less hacky way of getting the year?
                 tagger['date'] = str(album_info['releaseDate'][:4])
