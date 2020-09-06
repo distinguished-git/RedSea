@@ -146,7 +146,7 @@ class Tagger(object):
                 tagger.add_picture(pic)
             else:
                 print('\tCover file size is too large, only {0:.2f}MB are allowed.'.format(pic._MAX_SIZE / 1024 ** 2))
-                print('\tSet "artwork_size" to a lower value or disable "uncompressed_artwork" in config/settings.py')
+                print('\tSet "artwork_size" to a lower value in config/settings.py')
 
         # Set lyrics from Deezer
         if lyrics:

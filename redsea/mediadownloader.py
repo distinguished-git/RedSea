@@ -283,6 +283,21 @@ class MediaDownloader(object):
                         album_cover = album_cover.replace('100x100bb.jpg',
                                                           '{}x{}{}.jpg'.format(artwork_size, artwork_size, compressed))
                         self._dl_url(album_cover, aa_location)
+
+                        if ftype == 'flac':
+                            # Open cover.jpg to check size
+                            with open(aa_location, 'rb') as f:
+                                data = f.read()
+
+                            # Check if cover is smaller than 16MB
+                            max_size = 16777215
+                            if len(data) > max_size:
+                                print('\tCover file size is too large, only {0:.2f}MB are allowed.'.format(
+                                    max_size / 1024 ** 2))
+                                print('\tFallback to compressed iTunes cover')
+
+                                album_cover = album_cover.replace('-999', 'bb')
+                                self._dl_url(album_cover, aa_location)
                     except:
                         print('\tDownloading album art from Tidal...')
                         if not self._dl_picture(track_info['album']['cover'], aa_location):
