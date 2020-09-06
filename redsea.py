@@ -415,8 +415,13 @@ def main():
 
         # Playlist or album
         else:
-            print('<<< Downloading {0}: {1} track(s) in total >>>'.format(
-                MEDIA_TYPES[mt['type']] + (' ' + media_name if media_name else ''), total))
+            if mt['type'] == 'p':
+                name = md.playlist_from_id(mt['id'])['title']
+            else:
+                name = track_info[0][1]['title']
+                
+            print('<<< Downloading {0} "{1}": {2} track(s) in total >>>'.format(
+                MEDIA_TYPES[mt['type']] + (' ' + media_name if media_name else ''), name, total))
 
         if args.resumeon and len(media_to_download) == 1 and mt['type'] == 'p':
             print('<<< Resuming on track {} >>>'.format(args.resumeon))

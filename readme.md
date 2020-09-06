@@ -6,6 +6,11 @@ Current state
 -------------
 This fork is currently maintained by me ([Dniel97](https://github.com/Dniel97))
 
+Telegram
+--------
+Join the telegram group [RedSea Community](https://t.me/RedSea_Community) if you have questions, want to get help,
+submit bugs or want to talk to the developer.
+
 Introduction
 ------------
 RedSea is a music downloader and tagger for the Tidal music streaming service. It is designed partially as a Tidal API example. This repository also hosts a wildly incomplete Python Tidal
@@ -99,9 +104,9 @@ How to use
                             Select a session/account to use. Defaults to
                             the "default" session. If it does not exist, you
                             will be prompted to create one
-    -s, --skip            Pass this flag to skip track and continue when a track
+    -s, --skip              Pass this flag to skip track and continue when a track
                             does not meet the requested quality
-    --file                The URLs to download inside a .txt file with a single 
+    -f, --file              The URLs to download inside a .txt file with a single 
                             track/album/artist each line.
 
 #### Searching
@@ -146,7 +151,7 @@ To do/Whishlist
 * Move lyrics support to tagger.py
 * Support for being used as a python module (maybe pip?)
 * Maybe Spotify playlist support
-* Artist video download (which downloads all videos from a given artist)
+* Artist album/video download (which downloads all albums/videos from a given artist)
 
 Config reference
 ----------------
