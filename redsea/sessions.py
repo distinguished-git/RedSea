@@ -20,15 +20,19 @@ class RedseaSessionFile(TidalSessionFile):
 
         Returns True if successful
         '''
-        confirm = input('Do you want to use the new TV authorization (needed for E-AC-3 JOC)? [y/N]? ')
+        # confirm = input('Do you want to use the new TV authorization (needed for E-AC-3 JOC)? [y/N]? ')
+        confirm = input('Which login method do you want to use: TV (needed for MQA, E-AC-3),'
+                        'Mobile (needed for MQA, AC-4) or Desktop (FLAC only)? [t/m/d]? ')
 
-        if confirm.upper() == 'Y':
+        if confirm.upper() == 'T':
             device = 'tv'
-        else:
+        elif confirm.upper() == 'M':
             device = 'mobile'
+        else:
+            device = ''
 
         while True:
-            if device == 'mobile':
+            if device != 'tv':
                 print('LOGIN: Enter your Tidal username and password:\n')
                 username = input('Username: ')
                 password = getpass.getpass('Password: ')
@@ -72,7 +76,7 @@ class RedseaSessionFile(TidalSessionFile):
 
         print('Session saved!')
         if not self.default == name:
-            print('Session named "{}". Use the -a flag when running redsea to choose session'.format(name))
+            print('Session named "{}". Use the "-a {}" flag when running redsea to choose session'.format(name, name))
 
         return True
 
@@ -150,7 +154,7 @@ class RedseaSessionFile(TidalSessionFile):
             elif isinstance(self.sessions[s], TidalTvSession) and not mobile_only:
                 device = '[TV]'
             else:
-                device = ''
+                device = '[DESKTOP]'
 
             if mobile_only and isinstance(self.sessions[s], TidalTvSession):
                 continue
@@ -191,6 +195,10 @@ class RedseaSessionFile(TidalSessionFile):
             if name != '' and name in self.sessions:
                 try:
                     session = self.sessions[name]
+
+                    if isinstance(session, TidalTvSession):
+                        print('You cannot reauthenticate a TV session!')
+                        exit()
 
                     print('LOGIN: Enter your Tidal password for account {}:\n'.format(session.username))
                     password = getpass.getpass('Password: ')

@@ -46,9 +46,13 @@ COUNTRYCODE = "US"
 # Shows the Access JWT after every refresh and creation
 SHOWAUTH = True
 
-# This usually comes along with the authorization header
-# TOKEN = "WAU9gXp3tHhK4Nns"    # MQA Token
-TOKEN = "dN2N95wCyEBTllu4"  # Dolby Atmos AC-4 Token
+# The Desktop token
+# TOKEN = '_DSTon1kC8pABnTw'    # ALAC only
+TOKEN = 'wc8j_yBJd20zOmx0'      # FLAC only
+
+# The mobile token which usually comes along with the authorization header
+# MOBILE_TOKEN = "WAU9gXp3tHhK4Nns"    # MQA Token
+MOBILE_TOKEN = "dN2N95wCyEBTllu4"  # Dolby Atmos AC-4 Token
 
 # The TV_TOKEN and the line below (TV_SECRET) are tied together, so un-/comment both.
 TV_TOKEN = "LXujKdmnc6QtydvY"  # FireTV

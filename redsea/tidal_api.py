@@ -16,7 +16,7 @@ import requests
 from urllib3.util.retry import Retry
 from requests.adapters import HTTPAdapter
 
-from config.settings import TOKEN, TV_TOKEN, TV_SECRET, COUNTRYCODE, SHOWAUTH
+from config.settings import TOKEN, MOBILE_TOKEN, TV_TOKEN, TV_SECRET, COUNTRYCODE, SHOWAUTH
 
 
 class TidalRequestError(Exception):
@@ -207,7 +207,7 @@ class TidalSession(object):
     Tidal session object which can be used to communicate with Tidal servers
     '''
 
-    def __init__(self, username, password, token=TOKEN):
+    def __init__(self, username, password):
         '''
         Initiate a new session
         '''
@@ -215,8 +215,12 @@ class TidalSession(object):
         self.TIDAL_API_BASE = 'https://api.tidal.com/v1/'
 
         self.username = username
-        self.token = token
+        self.token = TOKEN
         self.unique_id = str(uuid.uuid4()).replace('-', '')[16:]
+
+        self.session_id = None
+        self.user_id = None
+        self.country_code = None
 
         self.auth(password)
 
@@ -239,12 +243,12 @@ class TidalSession(object):
 
         password = None
 
-        if 'status' in r and not r['status'] == 200:
+        if not r.status_code == 200:
             raise TidalRequestError(r)
 
-        self.session_id = r['sessionId']
-        self.user_id = r['userId']
-        self.country_code = r['countryCode']
+        self.session_id = r.json()['sessionId']
+        self.user_id = r.json()['userId']
+        self.country_code = r.json()['countryCode']
 
         assert self.valid(), 'This session has an invalid sessionId. Please re-authenticate'
 
@@ -252,28 +256,27 @@ class TidalSession(object):
         '''
         Returns the type of token used to create the session
         '''
-        return 'Mobile'
+        return 'Desktop'
 
     def valid(self):
         '''
         Checks if session is still valid and returns True/False
         '''
 
-        r = requests.get(self.TIDAL_API_BASE + 'users/' + str(self.user_id), headers=self.auth_headers()).json()
+        r = requests.get(self.TIDAL_API_BASE + 'users/' + str(self.user_id), headers=self.auth_headers())
 
-        if 'status' in r and not r['status'] == 200:
-            return False
-        else:
+        if r.status_code == 200:
             return True
+        else:
+            return False
 
     def auth_headers(self):
         return {
             'Host': 'api.tidal.com',
-            'X-Tidal-Token': TOKEN,
-            'Authorization': 'Bearer {}'.format(self.access_token),
+            'X-Tidal-Token': self.token,
+            'X-Tidal-SessionId': self.session_id,
             'Connection': 'Keep-Alive',
             'Accept-Encoding': 'gzip',
-            'User-Agent': 'TIDAL_ANDROID/995 okhttp/3.13.1'
         }
 
 
@@ -287,7 +290,7 @@ class TidalMobileSession(TidalSession):
         self.TIDAL_AUTH_BASE = 'https://auth.tidal.com/v1/'
 
         self.username = username
-        self.client_id = TOKEN
+        self.client_id = MOBILE_TOKEN
         self.redirect_uri = 'https://tidal.com/android/login/auth'
         self.code_verifier = base64.urlsafe_b64encode(secrets.token_bytes(32)).rstrip(b'=')
         self.code_challenge = base64.urlsafe_b64encode(hashlib.sha256(self.code_verifier).digest()).rstrip(b'=')
