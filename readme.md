@@ -20,16 +20,16 @@ Supported Codecs
 ----------------
 Tidal has a few different codecs it supports (only music is covered here)
 
-Quick glossary:
-EAC-3: Actually Dolby EAC-3 JOC aka Dolby Digital Plus with Dolby Atmos (Lossy)
-AC-4: Dolby AC-4 (Lossy)
-360: 360 Reality Audio on Tidal, actually the MPEG-H codec (Lossy)
-MQA: Master Quality Authenticated in the FLAC container (Lossy)
-FLAC: Free Lossless Audio Codec, the most popular lossless audio codec by far (Lossless)
-ALAC: Apple Lossless [Audio Codec], similar to FLAC (Lossless)
+Quick glossary:\
+EAC-3: Actually Dolby EAC-3 JOC aka Dolby Digital Plus with Dolby Atmos (Lossy)\
+AC-4: Dolby AC-4 (Lossy)\
+360: 360 Reality Audio on Tidal, actually the MPEG-H codec (Lossy)\
+MQA: Master Quality Authenticated in the FLAC container (Lossy)\
+FLAC: Free Lossless Audio Codec, the most popular lossless audio codec by far (Lossless)\
+ALAC: Apple Lossless [Audio Codec], similar to FLAC (Lossless)\
 AAC: Advanced Audio Coding, designed as a successor to MP3 (Lossy)
 
-Quality of these codecs from highest to lowest:
+Quality of these codecs from highest to lowest:\
 Normal listening
 1. MQA (even though it is lossy and highly debatable, a normal lossless 16 bit FLAC can be extracted, so it wins by technicality)
 2. FLAC (16 bit, 44.1kHz)/ALAC (both are lossless and can be converted from one another without loss)
@@ -44,25 +44,24 @@ Client IDs (also called tokens, X-Tidal-Token)
 --------------------
 Different devices are allocated different tokens, and are only allowed to retrieve specific codecs. Tidal has a relatively complex system of handling these. No way near as complex as Amazon's system, but still:
 
-Supported Codecs with an Android TV login:
-Most client IDs: MQA, FLAC, AAC
+Supported Codecs with an Android TV login:\
+Most client IDs: MQA, FLAC, AAC\
 NVIDIA Shield TV 2019, Amazon FireTV, some actual TVs that run Android: MQA, FLAC, AAC plus EAC-3 (theoretically nearly every Android TV should be able to support EAC-3, but Tidal does not allow them)
-Note: Android TVs use a system of client IDs plus client secrets, and the only way to retrieve EAC-3s is to root an NVIDIA Shield TV 2019, which is extremely complex and comes with its own issues, to get its client ID and secret
 
-Supported Codecs with an Android Mobile login:
-Most client IDs: MQA, FLAC, AAC, 360
+Supported Codecs with an Android Mobile login:\
+Most client IDs: MQA, FLAC, AAC, 360\
 Devices with a dedicated AC-4 hardware decoder: MQA, FLAC, AAC, 360 plus AC-4
 
-iOS: MQA, ALAC, AAC, 360
-tvOS: The specifics are unknown but we do know it uses MPEG-DASH streaming
-Desktop: MQA, FLAC, AAC (MQA is encrypted with extremely basic encryption, handled by RedSea fine, though the client ID (token) currently used by default does not support MQA)
+iOS: MQA, ALAC, AAC, 360\
+tvOS: The specifics are unknown but we do know it uses MPEG-DASH streaming\
+Desktop: MQA, FLAC, AAC (MQA is encrypted with extremely basic encryption, handled by RedSea fine, though the client ID (token) currently used by default does not support MQA)\
 Browser: FLAC, AAC
 
 Further Reading on supported devices and codecs:
-https://support.tidal.com/hc/en-us/articles/360004255778-Dolby-Atmos-Music (full up to date list of supported Android TVs for EAC-3 JOC)
-https://github.com/google/ExoPlayer/issues/6667#issuecomment-555845608 (Android phones that are actually capable of decoding AC-4, slightly outdated)
-https://www.dolby.com/experience/tidal/#tidal%20devices (some devices that support Dolby Atmos, missing a few devices that Tidal does actually support, but relatively up-to-date)
-https://avid.secure.force.com/pkb/articles/en_US/faq/AvidPlay-Distributing-Dolby-Atmos-Music-FAQ (bitrates and other background information, really interesting)
+* https://support.tidal.com/hc/en-us/articles/360004255778-Dolby-Atmos-Music (full up to date list of supported Android TVs for EAC-3 JOC)
+* https://github.com/google/ExoPlayer/issues/6667#issuecomment-555845608 (Android phones that are actually capable of decoding AC-4, slightly outdated)
+* https://www.dolby.com/experience/tidal/#tidal%20devices (some devices that support Dolby Atmos, missing a few devices that Tidal does actually support, but relatively up-to-date)
+* https://avid.secure.force.com/pkb/articles/en_US/faq/AvidPlay-Distributing-Dolby-Atmos-Music-FAQ (bitrates and other background information, really interesting)
 
 Retrieving your client ID
 -------------------------
