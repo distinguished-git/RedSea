@@ -1,6 +1,7 @@
 import pickle
 import uuid
 import os
+import re
 import json
 import urllib.parse as urlparse
 from urllib.parse import parse_qs
@@ -202,6 +203,67 @@ class TidalApi(object):
             album_id.replace('-', '/'), size)
 
 
+class ReCaptcha(object):
+    def __init__(self):
+        self.RECAPTCHA_BASE = 'https://www.google.com/recaptcha/'
+
+        self.k = '6Lf-N-0UAAAAAOm0_ZBFblrmIr7KRswyRawEBonm'
+        self.co = 'aHR0cHM6Ly9sb2dpbi50aWRhbC5jb206NDQz'
+        self.cb = 'swpp2es76yb6'
+
+        self.k2 = '6LcaN-0UAAAAAN056lYOwirUdIJ70tvy9QwNBajZ'
+        self.v = 'NjbyeWjjFy97MXGZ40KrXu3v'
+
+        self.release = None
+        self.token = None
+
+        self.get_release()
+
+    def get_release(self):
+        r = requests.get(self.RECAPTCHA_BASE + 'api.js', params={'render': self.k}, headers=self.headers())
+
+        assert (r.status_code == 200)
+
+        pattern = re.compile(r"(?<=releases/)[0-9A-Za-z]+")
+        release = pattern.findall(r.text)
+        self.release = release
+
+    def verify_user(self):
+        r = requests.post(self.RECAPTCHA_BASE + 'api2/userverify', params={'k': self.k})
+
+    def get_token(self):
+        params = {
+            'ar': '1',
+            'k': self.k,
+            'co': self.co,
+            'hl': 'en',
+            'v': self.release,
+            'size': 'invisible',
+            'cb': self.cb
+        }
+
+        r = requests.get(self.RECAPTCHA_BASE + 'api2/anchor', params=params, headers=self.headers())
+
+        assert (r.status_code == 200)
+
+        pattern = re.compile(r'(?<=value=")[0-9A-Za-z-_]+')
+        token = pattern.findall(r.text)
+
+        self.token = token[0]
+        return self.token
+
+    def headers(self):
+        return {
+            'Host': 'www.google.com',
+            'Connection': 'Keep-Alive',
+            'X-Requested-With': 'com.aspiro.tidal',
+            'Sec-Fetch-Site': 'cross-site',
+            'Sec-Fetch-Mode': 'no-cors',
+            'Sec-Fetch-Dest': 'script',
+            'Accept-Encoding': 'gzip, deflate'
+        }
+
+
 class TidalSession(object):
     '''
     Tidal session object which can be used to communicate with Tidal servers
@@ -300,11 +362,12 @@ class TidalMobileSession(TidalSession):
         self.refresh_token = None
         self.expires = None
         self.user_id = None
+        self.cid = None
         self.country_code = None
 
         self.auth(password)
 
-    def auth(self, password):
+    def auth(self, password, use_recaptcha=True):
         s = requests.Session()
 
         params = {
@@ -323,6 +386,20 @@ class TidalMobileSession(TidalSession):
 
         if r.status_code == 400:
             raise TidalAuthError("Authorization failed! Is the clientid/token up to date?")
+
+        if use_recaptcha:
+            captcha = ReCaptcha()
+            response = captcha.get_token()
+
+            r = s.post(self.TIDAL_LOGIN_BASE + 'recaptcha/verify/v3', json={
+                '_csrf': s.cookies['token'],
+                'token': response
+            })
+
+            assert (r.status_code == 200)
+            if not r.json()['success']:
+                print(r.json())
+
 
         # enter email, verify email is valid
         r = s.post('https://login.tidal.com/email', params=params, json={
