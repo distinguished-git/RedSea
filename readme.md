@@ -54,8 +54,24 @@ Devices with a dedicated AC-4 hardware decoder: MQA, FLAC, AAC, 360 plus AC-4
 
 iOS: MQA, ALAC, AAC, 360\
 tvOS: The specifics are unknown but we do know it uses MPEG-DASH streaming\
+macOS: ALAC, AAC\
 Desktop: MQA, FLAC, AAC (MQA is encrypted with extremely basic encryption, handled by RedSea fine, though the client ID (token) currently used by default does not support MQA)\
 Browser: FLAC, AAC
+
+Therefore:
+* To get the EAC-3 codec version of Dolby Atmos Music, the TV sign in must be used with the client ID and secret of one of the supported Android TVs (full list below) (bring your own TV client ID and secret)
+* To get the AC-4 codec version of Dolby Atmos music, the Mobile sign in must be used with the client ID of one of the supported phones (default mobile works)
+* To get MQA, use literally anything that is not the browser, nearly all client IDs work. (In this case change the client ID of the desktop login) (bring your own anything (TV, mobile, desktop))
+* To get ALAC without conversion, use the client ID of an iOS device, or the optional desktop token included from macOS (comment out the default FLAC supporting one, and uncomment the ALAC one) (secondary desktop works, or bring your own mobile)
+* To get 360, use the client ID of a supported Android or iOS device (nearly all support it anyway, so that's easy) (default mobile works)
+
+Client IDs provided by default:
+* TV: FireTV without EAC-3 support
+* Mobile: Default has AC-4 support (which also supports MQA by extension). There is also another one which only supports MQA without AC-4 optionally (commented out)
+* Desktop: Neither of the included ones support MQA! You must replace it with your own if you want MQA support! Default token can get FLACs only, whereas the optional one can get ALACs only (both are also able to get AAC)
+* Browser: Is completely unsupported for now, though why would you want it anyway?
+
+Note: Currently, mobile login is broken due to a recent change server-side on Tidal's end to validate reCAPTCHA responses finally, thus ending the saga unless we find a method to generate these responses automatically (unlikely)
 
 Further Reading on supported devices and codecs:
 * https://support.tidal.com/hc/en-us/articles/360004255778-Dolby-Atmos-Music (full up to date list of supported Android TVs for EAC-3 JOC)
