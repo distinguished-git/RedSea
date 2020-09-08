@@ -24,15 +24,23 @@ class RedseaSessionFile(TidalSessionFile):
         confirm = input('Which login method do you want to use: TV (needed for MQA, E-AC-3),'
                         'Mobile (needed for MQA, AC-4) or Desktop (FLAC only)? [t/m/d]? ')
 
+        token_confirm = 'N'
+        accesstoken = ''
+        refreshtoken = ''
+
         if confirm.upper() == 'T':
             device = 'tv'
         elif confirm.upper() == 'M':
             device = 'mobile'
+            token_confirm = input('Do you want to enter your accesstoken and refreshtoken? [y/N]')
+            if token_confirm.upper() == 'Y':
+                accesstoken = input('Accesstoken (eyJhbGciOiJIUzI1NiJ9 ...): ')
+                refreshtoken = input('Refreshtoken (eyJhbGciOiJIUzI1NiJ9 ...): ')
         else:
             device = ''
 
         while True:
-            if device != 'tv':
+            if device != 'tv' and token_confirm == 'N':
                 print('LOGIN: Enter your Tidal username and password:\n')
                 username = input('Username: ')
                 password = getpass.getpass('Password: ')
@@ -58,7 +66,7 @@ class RedseaSessionFile(TidalSessionFile):
                         return False
 
             try:
-                super().new_session(name, username, password, device=device)
+                super().new_session(name, username, password, device, accesstoken, refreshtoken)
                 break
             except TidalRequestError as e:
                 if str(e).startswith('3001'):
