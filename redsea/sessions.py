@@ -32,10 +32,10 @@ class RedseaSessionFile(TidalSessionFile):
             device = 'tv'
         elif confirm.upper() == 'M':
             device = 'mobile'
-            token_confirm = input('Do you want to enter your accesstoken and refreshtoken? [y/N]')
+            token_confirm = input('Do you want to enter your access_token and refresh_token [y/N]? ')
             if token_confirm.upper() == 'Y':
-                accesstoken = input('Accesstoken (eyJhbGciOiJIUzI1NiJ9 ...): ')
-                refreshtoken = input('Refreshtoken (eyJhbGciOiJIUzI1NiJ9 ...): ')
+                accesstoken = input('access_token (eyJhbGciOiJIUzI1NiJ9 ...): ')
+                refreshtoken = input('refresh_token (eyJhbGciOiJIUzI1NiJ9 ...): ')
         else:
             device = ''
 
@@ -76,11 +76,10 @@ class RedseaSessionFile(TidalSessionFile):
                     print('\nINVALID TOKEN. (HTTP 401)')
                     continue
             except AssertionError as e:
-                if 'invalid sessionId' in str(e):
-                    print(e)
-                    confirm = input('Would you like to try again [Y/n]? ')
-                    if not confirm.upper() == 'N':
-                        continue
+                print(e)
+                confirm = input('Would you like to try again [Y/n]? ')
+                if not confirm.upper() == 'N':
+                    continue
 
         print('Session saved!')
         if not self.default == name:

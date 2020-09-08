@@ -317,6 +317,10 @@ class TidalMobileSession(TidalSession):
         s = requests.Session()
 
         r = s.get('https://api.tidal.com/v1/sessions', headers=self.auth_headers())
+
+        if r.status_code == 401:
+            raise AssertionError("ERROR: " + r.json()['userMessage'])
+
         assert (r.status_code == 200)
         self.user_id = r.json()['userId']
         self.country_code = r.json()['countryCode']
@@ -435,6 +439,7 @@ class TidalMobileSession(TidalSession):
             'client_id': self.client_id,
             'grant_type': 'refresh_token'
         })
+
         if r.status_code == 200:
             print('\tRefreshing token successful')
             self.access_token = r.json()['access_token']
