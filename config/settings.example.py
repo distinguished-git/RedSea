@@ -107,6 +107,27 @@ PRESETS = {
         "AAC_96": True
     },
 
+    # This preset will download every song from playlist inside a playlist folder
+    "playlist": {
+        "keep_cover_jpg": False,
+        "embed_album_art": True,
+        "save_album_json": False,
+        "tries": 5,
+        "path": path,
+        "track_format": "{albumartist} - {title}",
+        "album_format": "",
+        "convert_to_alac": False,
+        "lyrics": True,
+        "lyrics_provider_order": ["Deezer", "musiXmatch"],
+        "artwork_size": 3000,
+        "uncompressed_artwork": False,
+        "resolution": 1080,
+        "MQA_FLAC_24": True,
+        "FLAC_16": True,
+        "AAC_320": False,
+        "AAC_96": False
+    },
+
     # This preset will only download FLAC 16
     "FLAC": {
         "keep_cover_jpg": True,
