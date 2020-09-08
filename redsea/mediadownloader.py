@@ -258,6 +258,12 @@ class MediaDownloader(object):
                 aa_location = path.join(album_location, 'Cover.jpg')
                 if not path.isfile(aa_location):
                     try:
+                        artwork_size = 1200
+                        if 'artwork_size' in preset:
+                            if preset['artwork_size'] == 0:
+                                raise Exception
+                            artwork_size = preset['artwork_size']
+
                         print('\tDownloading album art from iTunes...')
                         s = requests.Session()
 
@@ -271,10 +277,6 @@ class MediaDownloader(object):
                         # Get first album cover result
                         album_cover = r.json()['results'][0]['artworkUrl100']
                         # Get high resolution album cover
-
-                        artwork_size = 1200
-                        if 'artwork_size' in preset:
-                            artwork_size = preset['artwork_size']
 
                         compressed = 'bb'
                         if 'uncompressed_artwork' in preset:
