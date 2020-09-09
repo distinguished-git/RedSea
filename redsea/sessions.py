@@ -27,6 +27,7 @@ class RedseaSessionFile(TidalSessionFile):
         token_confirm = 'N'
         accesstoken = ''
         refreshtoken = ''
+        clientid = ''
 
         if confirm.upper() == 'T':
             device = 'tv'
@@ -36,6 +37,7 @@ class RedseaSessionFile(TidalSessionFile):
             if token_confirm.upper() == 'Y':
                 accesstoken = input('access_token (eyJhbGciOiJIUzI1NiJ9 ...): ')
                 refreshtoken = input('refresh_token (eyJhbGciOiJIUzI1NiJ9 ...): ')
+                clientid = input('client_id (Random numbers ...): ')
         else:
             device = ''
 
@@ -66,7 +68,7 @@ class RedseaSessionFile(TidalSessionFile):
                         return False
 
             try:
-                super().new_session(name, username, password, device, accesstoken, refreshtoken)
+                super().new_session(name, username, password, device, accesstoken, refreshtoken, clientid)
                 break
             except TidalRequestError as e:
                 if str(e).startswith('3001'):

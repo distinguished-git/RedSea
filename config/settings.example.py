@@ -40,9 +40,6 @@ AAC_96: 96Kbps AAC
 # BRUTEFORCEREGION: Attempts to download the track/album with all available accounts if dl fails
 BRUTEFORCEREGION = True
 
-# Allows switching the country
-COUNTRYCODE = "US"
-
 # Shows the Access JWT after every refresh and creation
 SHOWAUTH = True
 

@@ -6,3 +6,4 @@ downloads/
 .DS_Store
 .idea/
 settings.py
+node_modules/

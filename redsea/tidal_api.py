@@ -16,7 +16,7 @@ import requests
 from urllib3.util.retry import Retry
 from requests.adapters import HTTPAdapter
 
-from config.settings import TOKEN, MOBILE_TOKEN, TV_TOKEN, TV_SECRET, COUNTRYCODE, SHOWAUTH
+from config.settings import TOKEN, MOBILE_TOKEN, TV_TOKEN, TV_SECRET, SHOWAUTH
 
 
 class TidalRequestError(Exception):
@@ -56,7 +56,7 @@ class TidalApi(object):
         if params is None:
             params = {}
         urllib3.disable_warnings(urllib3.exceptions.InsecureRequestWarning)
-        params['countryCode'] = COUNTRYCODE
+        params['countryCode'] = self.session.country_code
         if 'limit' not in params:
             params['limit'] = '9999'
 
@@ -285,7 +285,7 @@ class TidalMobileSession(TidalSession):
     Tidal session object based on the mobile Android oauth flow
     '''
 
-    def __init__(self, username, password, access_token, refresh_token):
+    def __init__(self, username, password, access_token, refresh_token, client_id):
         self.TIDAL_LOGIN_BASE = 'https://login.tidal.com/'
         self.TIDAL_AUTH_BASE = 'https://auth.tidal.com/v1/'
 
@@ -303,16 +303,17 @@ class TidalMobileSession(TidalSession):
         self.country_code = None
 
         if access_token != '':
-            self.auth_token(access_token, refresh_token)
+            self.auth_token(access_token, refresh_token, client_id)
         else:
             self.auth(password)
 
-    def auth_token(self, access_token, refresh_token):
-        if refresh_token == '':
-            print('Your refresh token is empty, you need to enter you access token every day without it!')
+    def auth_token(self, access_token, refresh_token, client_id):
+        if refresh_token == '' or client_id == '':
+            print('Your refresh_token/client_id is empty, you need to enter you access token every day without it!')
 
         self.refresh_token = refresh_token
         self.access_token = access_token
+        self.client_id = client_id
 
         s = requests.Session()
 
@@ -450,6 +451,10 @@ class TidalMobileSession(TidalSession):
 
             if 'refresh_token' in r.json():
                 self.refresh_token = r.json()['refresh_token']
+
+        elif r.status_code == 401:
+            print('\tERROR: ' + r.json()['userMessage'])
+
         return r.status_code == 200
 
     def session_type(self):
@@ -546,7 +551,7 @@ class TidalTvSession(TidalSession):
         self.user_id = r.json()['userId']
         self.country_code = r.json()['countryCode']
 
-        r = requests.get('https://api.tidal.com/v1/users/{}?countryCode={}'.format(self.user_id, COUNTRYCODE),
+        r = requests.get('https://api.tidal.com/v1/users/{}?countryCode={}'.format(self.user_id, self.country_code),
                          headers=self.auth_headers())
         assert (r.status_code == 200)
         self.username = r.json()['username']
@@ -579,6 +584,7 @@ class TidalTvSession(TidalSession):
             'client_secret': self.client_secret,
             'grant_type': 'refresh_token'
         })
+
         if r.status_code == 200:
             print('\tRefreshing token successful')
             self.access_token = r.json()['access_token']
@@ -589,6 +595,7 @@ class TidalTvSession(TidalSession):
 
             if 'refresh_token' in r.json():
                 self.refresh_token = r.json()['refresh_token']
+
         return r.status_code == 200
 
     def session_type(self):
@@ -646,14 +653,14 @@ class TidalSessionFile(object):
         with open(self.session_file, 'wb') as f:
             pickle.dump(self.session_store, f)
 
-    def new_session(self, session_name, username, password, device, accesstoken, refreshtoken):
+    def new_session(self, session_name, username, password, device, accesstoken, refreshtoken, clientid):
         '''
         Create a new TidalSession object and auth with Tidal server
         '''
 
         if session_name not in self.sessions:
             if device == 'mobile':
-                session = TidalMobileSession(username, password, accesstoken, refreshtoken)
+                session = TidalMobileSession(username, password, accesstoken, refreshtoken, clientid)
             elif device == 'tv':
                 session = TidalTvSession()
             else:
