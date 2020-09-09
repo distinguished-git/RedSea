@@ -35,9 +35,9 @@ class RedseaSessionFile(TidalSessionFile):
             device = 'mobile'
             token_confirm = input('Do you want to enter your access_token and refresh_token [y/N]? ')
             if token_confirm.upper() == 'Y':
-                accesstoken = input('access_token (eyJhbGciOiJIUzI1NiJ9 ...): ')
-                refreshtoken = input('refresh_token (eyJhbGciOiJIUzI1NiJ9 ...): ')
-                clientid = input('client_id (Random numbers ...): ')
+                accesstoken = input('access_token/oAuthAccessToken (eyJhbGciOiJIUzI1NiJ9 ...): ')
+                refreshtoken = input('refresh_token/oAuthRefreshToken (eyJhbGciOiJIUzI1NiJ9 ...): ')
+                clientid = input('client_id/apiToken (Random numbers ...): ')
         else:
             device = ''
 

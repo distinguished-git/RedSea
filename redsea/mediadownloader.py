@@ -255,6 +255,12 @@ class MediaDownloader(object):
             try:
                 temp_file = self._dl_url(url, track_path)
 
+                if 'encryptionType' in manifest and manifest['encryptionType'] != 'NONE':
+                    if not manifest['keyId'] == '':
+                        print('\tLooks like file is encrypted. Decrypting...')
+                        key, nonce = decrypt_security_token(manifest['keyId'])
+                        decrypt_file(temp_file, key, nonce)
+
                 aa_location = path.join(album_location, 'Cover.jpg')
                 if not path.isfile(aa_location):
                     try:
