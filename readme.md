@@ -56,37 +56,9 @@ Requirements
 * deezerapi (already included from [deemix](https://codeberg.org/RemixDev/deemix))
 
 
-First setup
------------
-After downloading RedSea, copy `config/settings.example.py` and rename it to `config/settings.py`, now you can set all your preferences inside `settings.py`.
-
-#### Linux:
-1. Run `sudo apt update` 
-2. Run `sudo apt install ffmpeg`
-
-#### MacOS:
-1. If you haven't already installed Homebew: Run `/bin/bash -c "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/master/install.sh)"`
-2. Run `brew install ffmpeg`
-
-#### Windows:
-1. Download [ffmpeg](https://ffmpeg.zeranoe.com/builds/)
-2. Unpack the zip folder `ffmpeg-XXXXX-win64-static.zip` inside `C:\Program Files\ffmpeg\`
-3. Go to `Control Panel > System and Security > System > Advanced system settings > Environment Variables ...`
-4. In the Environment Variables window, click the `Path` row under the `Variable` column, then click `Edit..`
-5. Click on `New` inside the `Edit environment variable` window and paste `C:\Program Files\ffmpeg\bin\`
-
-Setting up (with pip)
-------------------------
-1. Run `pip install -r requirements.txt` to install dependencies
-2. Run `python redsea.py -h` to view the help file
-3. Run `python redsea.py urls` to download lossless files from urls
-4. Run `python redsea.py --file links.txt` to download tracks/albums/artists/ from a file where each line is a link
-
-Setting up (with Pipenv)
-------------------------
-1. Run `pipenv install --three` to install dependencies in a virtual env using Pipenv
-2. Run `pipenv run python redsea.py -h` to view the help file
-3. Run `pipenv run python redsea.py urls` to download lossless files from urls
+Installation
+------------
+The new more detailed Installation Guide has been moved to the Wiki: [https://github.com/Dniel97/RedSea/wiki/Installation-Guide](https://github.com/Dniel97/RedSea/wiki/Installation-Guide)
 
 How to add accounts/sessions
 ----------------------------
