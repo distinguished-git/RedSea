@@ -16,6 +16,7 @@ import sys
 import requests
 from urllib3.util.retry import Retry
 from requests.adapters import HTTPAdapter
+from subprocess import Popen, PIPE
 
 from config.settings import TOKEN, MOBILE_TOKEN, TV_TOKEN, TV_SECRET, SHOWAUTH
 
@@ -205,63 +206,41 @@ class TidalApi(object):
 
 class ReCaptcha(object):
     def __init__(self):
-        self.RECAPTCHA_BASE = 'https://www.google.com/recaptcha/'
+        self.captcha_path = 'captcha/'
 
-        self.k = '6Lf-N-0UAAAAAOm0_ZBFblrmIr7KRswyRawEBonm'
-        self.co = 'aHR0cHM6Ly9sb2dpbi50aWRhbC5jb206NDQz'
-        self.cb = 'swpp2es76yb6'
+        self.response_v3 = None
+        self.response_v2 = None
 
-        self.k2 = '6LcaN-0UAAAAAN056lYOwirUdIJ70tvy9QwNBajZ'
-        self.v = 'NjbyeWjjFy97MXGZ40KrXu3v'
+        self.get_response()
 
-        self.release = None
-        self.token = None
+    def check_npm(self):
+        pipe = Popen('npm -version', shell=True, stdout=PIPE).stdout
+        output = pipe.read().decode('UTF-8')
+        if '6.1' in output:
+            return True
+        else:
+            print("NPM could not be found.")
+            return False
 
-        self.get_release()
-
-    def get_release(self):
-        r = requests.get(self.RECAPTCHA_BASE + 'api.js', params={'render': self.k}, headers=self.headers())
-
-        assert (r.status_code == 200)
-
-        pattern = re.compile(r"(?<=releases/)[0-9A-Za-z]+")
-        release = pattern.findall(r.text)
-        self.release = release
-
-    def verify_user(self):
-        r = requests.post(self.RECAPTCHA_BASE + 'api2/userverify', params={'k': self.k})
-
-    def get_token(self):
-        params = {
-            'ar': '1',
-            'k': self.k,
-            'co': self.co,
-            'hl': 'en',
-            'v': self.release,
-            'size': 'invisible',
-            'cb': self.cb
-        }
-
-        r = requests.get(self.RECAPTCHA_BASE + 'api2/anchor', params=params, headers=self.headers())
-
-        assert (r.status_code == 200)
-
-        pattern = re.compile(r'(?<=value=")[0-9A-Za-z-_]+')
-        token = pattern.findall(r.text)
-
-        self.token = token[0]
-        return self.token
-
-    def headers(self):
-        return {
-            'Host': 'www.google.com',
-            'Connection': 'Keep-Alive',
-            'X-Requested-With': 'com.aspiro.tidal',
-            'Sec-Fetch-Site': 'cross-site',
-            'Sec-Fetch-Mode': 'no-cors',
-            'Sec-Fetch-Dest': 'script',
-            'Accept-Encoding': 'gzip, deflate'
-        }
+    def get_response(self):
+        if self.check_npm():
+            print("Opening reCAPTCHA check...")
+            command = 'npm start --prefix '
+            pipe = Popen(command + self.captcha_path, shell=True, stdout=PIPE)
+            pipe.wait()
+            output = pipe.stdout.read().decode('UTF-8')
+            pattern = re.compile(r"(?<='response': ')[0-9A-Za-z-_]+")
+            response = pattern.findall(output)
+            if len(response) > 2:
+                print('You only need to complete the captcha once.')
+                return False
+            elif len(response) > 0:
+                self.response_v3 = response[0]
+                # self.response_v2 = response[1]
+                return True
+            else:
+                print('Please complete the reCAPTCHA check.')
+                return False
 
 
 class TidalSession(object):
@@ -420,25 +399,28 @@ class TidalMobileSession(TidalSession):
         if r.status_code == 400:
             raise TidalAuthError("Authorization failed! Is the clientid/token up to date?")
 
+        recaptcha_response = ''
+
         if use_recaptcha:
             captcha = ReCaptcha()
-            response = captcha.get_token()
 
             r = s.post(self.TIDAL_LOGIN_BASE + 'recaptcha/verify/v3', json={
                 '_csrf': s.cookies['token'],
-                'token': response
+                'token': captcha.response_v3
             })
 
             assert (r.status_code == 200)
             if not r.json()['success']:
-                print(r.json())
+                raise TidalAuthError(r.json())
 
+            if not r.json()['skipRecaptchaV2']:
+                recaptcha_response = captcha.response_v2
 
         # enter email, verify email is valid
         r = s.post('https://login.tidal.com/email', params=params, json={
             '_csrf': s.cookies['token'],
             'email': self.username,
-            'recaptchaResponse': ''
+            'recaptchaResponse': recaptcha_response
         })
 
         if r.status_code == 401:

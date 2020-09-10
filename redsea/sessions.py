@@ -33,7 +33,7 @@ class RedseaSessionFile(TidalSessionFile):
             device = 'tv'
         elif confirm.upper() == 'M':
             device = 'mobile'
-            token_confirm = input('Do you want to enter your access_token and refresh_token [y/N]? ')
+            token_confirm = input('Do you want to enter your access_token, refresh_token and client_id [y/N]? ')
             if token_confirm.upper() == 'Y':
                 accesstoken = input('access_token/oAuthAccessToken (eyJhbGciOiJIUzI1NiJ9 ...): ')
                 refreshtoken = input('refresh_token/oAuthRefreshToken (eyJhbGciOiJIUzI1NiJ9 ...): ')
@@ -42,7 +42,7 @@ class RedseaSessionFile(TidalSessionFile):
             device = ''
 
         while True:
-            if device != 'tv' and token_confirm == 'N':
+            if device != 'tv' and token_confirm.upper() == 'N':
                 print('LOGIN: Enter your Tidal username and password:\n')
                 username = input('Username: ')
                 password = getpass.getpass('Password: ')
