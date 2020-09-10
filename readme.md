@@ -16,49 +16,8 @@ Introduction
 RedSea is a music downloader and tagger for the Tidal music streaming service. It is designed partially as a Tidal API example. This repository also hosts a wildly incomplete Python Tidal
 API implementation - it is contained in `redsea/tidal_api.py` and only requires `requests` to be installed.
 
-Supported Codecs
-----------------
-Tidal has a few different codecs it supports (only music is covered here)
-
-Quick glossary:\
-EAC-3: Actually Dolby EAC-3 JOC aka Dolby Digital Plus with Dolby Atmos (Lossy)\
-AC-4: Dolby AC-4 (Lossy)\
-360: 360 Reality Audio on Tidal, actually the MPEG-H codec (Lossy)\
-MQA: Master Quality Authenticated in the FLAC container (Lossy)\
-FLAC: Free Lossless Audio Codec, the most popular lossless audio codec by far (Lossless)\
-ALAC: Apple Lossless [Audio Codec], similar to FLAC (Lossless)\
-AAC: Advanced Audio Coding, designed as a successor to MP3 (Lossy)
-
-Quality of these codecs from highest to lowest:\
-Normal listening
-1. MQA (even though it is lossy and highly debatable, a normal lossless 16 bit FLAC can be extracted, so it wins by technicality)
-2. FLAC (16 bit, 44.1kHz)/ALAC (both are lossless and can be converted from one another without loss)
-3. AAC (96 or 320 kbps depending on selected quality, 320 being higher quality, variable bitrate (VBR)) 
-
-Immersive surround sound listening:
-1. EAC-3 (based on 5.1 surround with Dolby Atmos metadata added, 768kbps bitrate but it is a significantly less efficient than AC-4 and it has more channels so quality is debatable)
-2. AC-4 (based on stereo (2.0 not surround) with Dolby Atmos metadata added, 256kbps bitrate)
-3. 360 (garbage in testing, though untested with actual supported headphones so it may actually be great)
-
-Client IDs (also called tokens, X-Tidal-Token)
---------------------
-Different devices are allocated different tokens, and are only allowed to retrieve specific codecs. Tidal has a relatively complex system of handling these. No way near as complex as Amazon's system, but still:
-
-Supported Codecs with an Android TV login:\
-Most client IDs: MQA, FLAC, AAC\
-NVIDIA Shield TV 2019, Amazon FireTV, some actual TVs that run Android: MQA, FLAC, AAC plus EAC-3 (theoretically nearly every Android TV should be able to support EAC-3, but Tidal does not allow them)
-
-Supported Codecs with an Android Mobile login:\
-Most client IDs: MQA, FLAC, AAC, 360\
-Devices with a dedicated AC-4 hardware decoder: MQA, FLAC, AAC, 360 plus AC-4
-
-iOS: MQA, ALAC, AAC, 360\
-tvOS: The specifics are unknown but we do know it uses MPEG-DASH streaming\
-macOS: ALAC, AAC\
-Desktop: MQA, FLAC, AAC (MQA is encrypted with extremely basic encryption, handled by RedSea fine, though the client ID (token) currently used by default does not support MQA)\
-Browser: FLAC, AAC
-
-Therefore:
+Choosing login types and client IDs
+-----------------------------------
 * To get the EAC-3 codec version of Dolby Atmos Music, the TV sign in must be used with the client ID and secret of one of the supported Android TVs (full list below) (bring your own TV client ID and secret)
 * To get the AC-4 codec version of Dolby Atmos music, the Mobile sign in must be used with the client ID of one of the supported phones (default mobile works)
 * To get MQA, use literally anything that is not the browser, nearly all client IDs work. (In this case change the client ID of the desktop login) (bring your own anything (TV, mobile, desktop))
@@ -97,37 +56,9 @@ Requirements
 * deezerapi (already included from [deemix](https://codeberg.org/RemixDev/deemix))
 
 
-First setup
------------
-After downloading RedSea, copy `config/settings.example.py` and rename it to `config/settings.py`, now you can set all your preferences inside `settings.py`.
-
-#### Linux:
-1. Run `sudo apt update` 
-2. Run `sudo apt install ffmpeg`
-
-#### MacOS:
-1. If you haven't already installed Homebew: Run `/bin/bash -c "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/master/install.sh)"`
-2. Run `brew install ffmpeg`
-
-#### Windows:
-1. Download [ffmpeg](https://ffmpeg.zeranoe.com/builds/)
-2. Unpack the zip folder `ffmpeg-XXXXX-win64-static.zip` inside `C:\Program Files\ffmpeg\`
-3. Go to `Control Panel > System and Security > System > Advanced system settings > Environment Variables ...`
-4. In the Environment Variables window, click the `Path` row under the `Variable` column, then click `Edit..`
-5. Click on `New` inside the `Edit environment variable` window and paste `C:\Program Files\ffmpeg\bin\`
-
-Setting up (with pip)
-------------------------
-1. Run `pip install -r requirements.txt` to install dependencies
-2. Run `python redsea.py -h` to view the help file
-3. Run `python redsea.py urls` to download lossless files from urls
-4. Run `python redsea.py --file links.txt` to download tracks/albums/artists/ from a file where each line is a link
-
-Setting up (with Pipenv)
-------------------------
-1. Run `pipenv install --three` to install dependencies in a virtual env using Pipenv
-2. Run `pipenv run python redsea.py -h` to view the help file
-3. Run `pipenv run python redsea.py urls` to download lossless files from urls
+Installation
+------------
+The new more detailed Installation Guide has been moved to the Wiki: [https://github.com/Dniel97/RedSea/wiki/Installation-Guide](https://github.com/Dniel97/RedSea/wiki/Installation-Guide)
 
 How to add accounts/sessions
 ----------------------------

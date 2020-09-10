@@ -24,15 +24,25 @@ class RedseaSessionFile(TidalSessionFile):
         confirm = input('Which login method do you want to use: TV (needed for MQA, E-AC-3),'
                         'Mobile (needed for MQA, AC-4) or Desktop (FLAC only)? [t/m/d]? ')
 
+        token_confirm = 'N'
+        accesstoken = ''
+        refreshtoken = ''
+        clientid = ''
+
         if confirm.upper() == 'T':
             device = 'tv'
         elif confirm.upper() == 'M':
             device = 'mobile'
+            token_confirm = input('Do you want to enter your access_token and refresh_token [y/N]? ')
+            if token_confirm.upper() == 'Y':
+                accesstoken = input('access_token/oAuthAccessToken (eyJhbGciOiJIUzI1NiJ9 ...): ')
+                refreshtoken = input('refresh_token/oAuthRefreshToken (eyJhbGciOiJIUzI1NiJ9 ...): ')
+                clientid = input('client_id/apiToken (Random numbers ...): ')
         else:
             device = ''
 
         while True:
-            if device != 'tv':
+            if device != 'tv' and token_confirm == 'N':
                 print('LOGIN: Enter your Tidal username and password:\n')
                 username = input('Username: ')
                 password = getpass.getpass('Password: ')
@@ -58,7 +68,7 @@ class RedseaSessionFile(TidalSessionFile):
                         return False
 
             try:
-                super().new_session(name, username, password, device=device)
+                super().new_session(name, username, password, device, accesstoken, refreshtoken, clientid)
                 break
             except TidalRequestError as e:
                 if str(e).startswith('3001'):
@@ -68,11 +78,10 @@ class RedseaSessionFile(TidalSessionFile):
                     print('\nINVALID TOKEN. (HTTP 401)')
                     continue
             except AssertionError as e:
-                if 'invalid sessionId' in str(e):
-                    print(e)
-                    confirm = input('Would you like to try again [Y/n]? ')
-                    if not confirm.upper() == 'N':
-                        continue
+                print(e)
+                confirm = input('Would you like to try again [Y/n]? ')
+                if not confirm.upper() == 'N':
+                    continue
 
         print('Session saved!')
         if not self.default == name:
