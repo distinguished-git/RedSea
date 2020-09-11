@@ -234,9 +234,12 @@ class ReCaptcha(object):
             if len(response) > 2:
                 print('You only need to complete the captcha once.')
                 return False
-            elif len(response) > 0:
+            elif len(response) == 1:
                 self.response_v3 = response[0]
-                # self.response_v2 = response[1]
+                return True
+            elif len(response) == 2:
+                self.response_v3 = response[0]
+                self.response_v2 = response[1]
                 return True
             else:
                 print('Please complete the reCAPTCHA check.')
@@ -410,6 +413,9 @@ class TidalMobileSession(TidalSession):
             })
 
             assert (r.status_code == 200)
+
+            print('reCAPTCHA v3 score: ' + str(r.json()['score']))
+
             if not r.json()['success']:
                 raise TidalAuthError(r.json())
 

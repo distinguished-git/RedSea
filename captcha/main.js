@@ -8,87 +8,109 @@ let tray = null;
 let mainWindow;
 let trayIcon = __dirname + "/icon.png";
 
-function createTray(){
-	tray = new Tray(trayIcon);
-	const contextMenu = Menu.buildFromTemplate([
-		{
-			label: 'Show App',
-			click: function() {
-				if (mainWindow) mainWindow.show();
-			}
-		},
-		{
-			label: 'Quit',
-			click: function() {
-				app.isQuiting = true;
-				if (mainWindow){mainWindow.close()}else{app.quit()};
-			}
-		}
-	]);
+const isMac = process.platform === 'darwin'
 
-	tray.setToolTip('Tidal Recaptcha');
-	tray.setContextMenu(contextMenu);
+function createTray() {
+    tray = new Tray(trayIcon);
+    const contextMenu = Menu.buildFromTemplate([
+        {
+            label: 'Show App',
+            click: function () {
+                if (mainWindow) mainWindow.show();
+            }
+        },
+        {
+            label: 'Quit',
+            click: function () {
+                app.isQuiting = true;
+                if (mainWindow) {
+                    mainWindow.close()
+                } else {
+                    app.quit()
+                }
+                ;
+            }
+        }
+    ]);
 
-	tray.on('click', function(e){
-		if (mainWindow){
-			if (mainWindow.isVisible()) {
-				mainWindow.hide()
-			} else {
-				mainWindow.show()
-			}
-		}
-	});
+    tray.setToolTip('Tidal Recaptcha');
+    app.dock.setIcon(trayIcon);
+    tray.setContextMenu(contextMenu);
+
+    tray.on('click', function (e) {
+        if (mainWindow) {
+            if (mainWindow.isVisible()) {
+                mainWindow.hide()
+            } else {
+                mainWindow.show()
+            }
+        }
+    });
 }
 
 function createWindow() {
-	// Create browser window
-	mainWindow = new BrowserWindow({
-		width: 350,
-		height: 600,
-		icon: trayIcon,
-		webPreferences: {
-			nodeIntegration: true,
-			enableRemoteModule: true
-		}
-	});
+    // Create browser window
+    mainWindow = new BrowserWindow({
+        width: 350,
+        height: 600,
+        icon: trayIcon,
+        webPreferences: {
+            nodeIntegration: true,
+            enableRemoteModule: true
+        }
+    });
 
-	mainWindow.setMenu(null);
+    mainWindow.setMenu(null);
 
-	let template = [{
-		label: "Application",
-		submenu: [
-			{ label: "Quit", accelerator: "Command+Q", click: function() { app.quit(); }}
-		]}, {
-		label: "Edit",
-		submenu: [
-			{ label: "Undo", accelerator: "CmdOrCtrl+Z", selector: "undo:" },
-			{ label: "Redo", accelerator: "Shift+CmdOrCtrl+Z", selector: "redo:" },
-			{ type: "separator" },
-			{ label: "Cut", accelerator: "CmdOrCtrl+X", selector: "cut:" },
-			{ label: "Copy", accelerator: "CmdOrCtrl+C", selector: "copy:" },
-			{ label: "Paste", accelerator: "CmdOrCtrl+V", selector: "paste:" },
-			{ label: "Select All", accelerator: "CmdOrCtrl+A", selector: "selectAll:" }
-		]}
-	];
+    let template = [
+    	isMac ? {
+        label: app.name,
+        submenu: [
+            {label: "About Tidal reCAPTCHA", role: 'about'},
+            {type: 'separator'},
+            {
+                label: "Quit", accelerator: "Command+Q", click: function () {
+                    app.quit();
+                }
+            }
+        ]} : {},
+        {
+            label: 'File',
+            submenu: [
+                isMac ? {role: 'close'} : {role: 'quit'}
+            ]
+        }, {
+            label: "Edit",
+            submenu: [
+                {label: "Undo", accelerator: "CmdOrCtrl+Z", selector: "undo:"},
+                {label: "Redo", accelerator: "Shift+CmdOrCtrl+Z", selector: "redo:"},
+                {type: "separator"},
+                {label: "Cut", accelerator: "CmdOrCtrl+X", selector: "cut:"},
+                {label: "Copy", accelerator: "CmdOrCtrl+C", selector: "copy:"},
+                {label: "Paste", accelerator: "CmdOrCtrl+V", selector: "paste:"},
+                {label: "Select All", accelerator: "CmdOrCtrl+A", selector: "selectAll:"}
+            ]
+        }
+    ];
 
-	Menu.setApplicationMenu(Menu.buildFromTemplate(template));
+    Menu.setApplicationMenu(Menu.buildFromTemplate(template));
 
-	mainWindow.loadFile('public/html/index.html');
+    mainWindow.loadFile('public/html/index.html');
 
-	// mainWindow.openDevTools();
+    // mainWindow.openDevTools();
 }
 
 // This method will be called when Electron has finished
 // initialization and is ready to create browser windows.
-app.on('ready', function(){
-	createTray();
-	createWindow();
-	captcha.registerProtocol();
+app.on('ready', function () {
+    createTray();
+    createWindow();
+    captcha.registerProtocol();
 });
 
 // Quit when all windows are closed, except on macOS. There, it's common
 // for applications and their menu bar to stay active until the user quits
 // explicitly with Cmd + Q.
 app.on('window-all-closed', () => {
-	app.quit()
+    app.quit()
 });

@@ -1,5 +1,5 @@
 {
-  "name": "captcha",
+  "name": "tidal_recaptcha",
   "version": "0.1.0",
   "description": "Get the reCaptcha response from Tidal",
   "main": "main.js",
