@@ -28,13 +28,14 @@ function createTray() {
                 } else {
                     app.quit()
                 }
-                ;
             }
         }
     ]);
 
     tray.setToolTip('Tidal Recaptcha');
-    app.dock.setIcon(trayIcon);
+    if (isMac) {
+        app.dock.setIcon(trayIcon);
+    }
     tray.setContextMenu(contextMenu);
 
     tray.on('click', function (e) {
@@ -52,7 +53,7 @@ function createWindow() {
     // Create browser window
     mainWindow = new BrowserWindow({
         width: 350,
-        height: 600,
+        height: 650,
         icon: trayIcon,
         webPreferences: {
             nodeIntegration: true,
@@ -63,23 +64,38 @@ function createWindow() {
     mainWindow.setMenu(null);
 
     let template = [
-    	isMac ? {
-        label: app.name,
-        submenu: [
-            {label: "About Tidal reCAPTCHA", role: 'about'},
-            {type: 'separator'},
-            {
-                label: "Quit", accelerator: "Command+Q", click: function () {
-                    app.quit();
-                }
-            }
-        ]} : {},
-        {
-            label: 'File',
+        isMac ? {
+            label: 'Tidal reCAPTCHA',
             submenu: [
-                isMac ? {role: 'close'} : {role: 'quit'}
+                {label: "About Tidal reCAPTCHA", role: 'about'},
+                {type: 'separator'},
+                {
+                    label: "Quit", accelerator: "Command+Q", click: function () {
+                        app.quit();
+                    }
+                }
             ]
-        }, {
+        } : {
+            label: 'Tidal reCAPTCHA',
+            submenu: [
+                {label: 'Close', role: 'quit'}
+                ]
+        },
+        {
+            label: 'View',
+            submenu: [
+                {label: 'Reload', role: 'reload'},
+                {label: 'Force Reload', role: 'forceReload'},
+                {label: 'Toggle Developer Tools', role: 'toggleDevTools'},
+                {type: 'separator'},
+                {label: 'Actual Size', role: 'resetZoom'},
+                {label: 'Zoom in', role: 'zoomIn'},
+                {label: 'Zoom out', role: 'zoomOut'},
+                {type: 'separator'},
+                {label: 'Toogle Full Screen', role: 'togglefullscreen'}
+            ]
+        },
+        {
             label: "Edit",
             submenu: [
                 {label: "Undo", accelerator: "CmdOrCtrl+Z", selector: "undo:"},
