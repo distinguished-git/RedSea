@@ -1,4 +1,4 @@
-const {protocol} = require('electron');
+const {app, protocol} = require('electron');
 const url = require('url');
 const fs = require('fs');
 const path = require('path');
@@ -12,6 +12,8 @@ module.exports = {
         // registerProtocol must be called before callback can set
         // so this is just a placeholder for the real callback function
         console.log("'response': '" + data + "'");
+        // if it gets a response close the app
+        app.exit(0)
     },
     registerScheme: function () {
         protocol.registerSchemesAsPrivileged([{ scheme: 'cap', privileges: { standard: true, secure: true, supportFetchAPI: true } }])
