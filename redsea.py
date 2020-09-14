@@ -300,7 +300,7 @@ def main():
                     elif media['type'] == 'p':
                         # Get playlist title to create path
                         playlist = md.api.get_playlist(media['id'])
-                        md.opts['path'] += '/' + playlist['title']
+                        md.opts['path'] += '/' +  md._sanitise_name(playlist['title'])
                         # Make sure only tracks are in playlist items
                         playlistItems = md.api.get_playlist_items(media['id'])['items']
                         for item in playlistItems:
