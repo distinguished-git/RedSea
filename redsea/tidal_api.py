@@ -77,7 +77,6 @@ class TidalApi(object):
                 params=params,
                 verify=False)
 
-
         # if the request 401s or 403s, try refreshing the TV/Mobile session in case that helps
         if not refresh and (resp.status_code == 401 or resp.status_code == 403):
             if isinstance(self.session, TidalMobileSession) or isinstance(self.session, TidalTvSession):
@@ -114,7 +113,8 @@ class TidalApi(object):
         })
 
     def get_search_data(self, searchterm):
-        return self._get('search', params={'query': str(searchterm), 'offset': 0, 'limit': 10, 'includeContributors': 'true'})
+        return self._get('search',
+                         params={'query': str(searchterm), 'offset': 0, 'limit': 10, 'includeContributors': 'true'})
 
     def get_page(self, pageurl):
         return self._get('pages/' + pageurl, params={'deviceType': 'TV', 'locale': 'en_US', 'mediaFormats': 'SONY_360'})
@@ -199,7 +199,6 @@ class TidalApi(object):
             pass
 
         return result
-
 
     @classmethod
     def get_album_artwork_url(cls, album_id, size=1280):
@@ -679,6 +678,7 @@ class TidalTvSession(TidalSession):
             'User-Agent': 'TIDAL_ANDROID/1000 okhttp/3.13.1'
         }
 
+
 class TidalWebSession(TidalSession):
     def __init__(self, username, password, access_token, refresh_token, client_id):
         self.TIDAL_LOGIN_BASE = 'https://login.tidal.com/'
@@ -838,14 +838,6 @@ class TidalWebSession(TidalSession):
 
         assert (self.check_subscription() is True)
 
-    def get_widevine_license(self, securityToken, payload):
-        r = requests.post('https://listen.tidal.com/v1/drm/licenses/widevine?token=' + self.client_id, json={
-            'payload': payload.decode('UTF-8'),
-            'securityToken': securityToken
-        }, verify=False)
-        return r.json()
-
-
     def check_subscription(self):
         if self.access_token is not None:
             r = requests.get('https://api.tidal.com/v1/users/' + str(self.user_id) + '/subscription',
@@ -889,7 +881,7 @@ class TidalWebSession(TidalSession):
         return r.status_code == 200
 
     def session_type(self):
-        return 'Mobile'
+        return 'Web'
 
     def auth_headers(self):
         return {
@@ -900,6 +892,7 @@ class TidalWebSession(TidalSession):
             'Accept-Encoding': 'gzip',
             'User-Agent': 'TIDAL_ANDROID/1000 okhttp/3.13.1'
         }
+
 
 class TidalSessionFile(object):
     '''
@@ -994,6 +987,8 @@ class TidalSessionFile(object):
                 self.sessions[session_name].refresh()
             if not self.sessions[session_name].valid() and isinstance(self.sessions[session_name], TidalTvSession):
                 self.sessions[session_name].refresh()
+            if not self.sessions[session_name].valid() and isinstance(self.sessions[session_name], TidalWebSession):
+                self.sessions[session_name].refresh()
             assert self.sessions[session_name].valid(), '{} has an invalid sessionId. Please re-authenticate'.format(
                 session_name)
             return self.sessions[session_name]
@@ -1010,6 +1005,8 @@ class TidalSessionFile(object):
             if not self.sessions[session_name].valid() and isinstance(self.sessions[session_name], TidalMobileSession):
                 self.sessions[session_name].refresh()
             if not self.sessions[session_name].valid() and isinstance(self.sessions[session_name], TidalTvSession):
+                self.sessions[session_name].refresh()
+            if not self.sessions[session_name].valid() and isinstance(self.sessions[session_name], TidalWebSession):
                 self.sessions[session_name].refresh()
             assert self.sessions[session_name].valid(), '{} has an invalid sessionId. Please re-authenticate'.format(
                 session_name)

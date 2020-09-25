@@ -22,7 +22,7 @@ class RedseaSessionFile(TidalSessionFile):
         '''
         # confirm = input('Do you want to use the new TV authorization (needed for E-AC-3 JOC)? [y/N]? ')
         confirm = input('Which login method do you want to use: TV (needed for MQA, E-AC-3), '
-                        'Mobile (needed for MQA, AC-4) or Desktop (FLAC only)? [t/m/d]? ')
+                        'Mobile (needed for MQA, AC-4), Desktop (MQA) or Web (private use only, FLAC only)? [t/m/d/w]? ')
 
         token_confirm = 'N'
         accesstoken = ''
