@@ -55,6 +55,9 @@ MOBILE_TOKEN = "dN2N95wCyEBTllu4"  # Dolby Atmos AC-4 Token
 TV_TOKEN = "LXujKdmnc6QtydvY"  # FireTV
 TV_SECRET = "7iM9rMsPlM2xDY5AiToS7XgVVnG28bjsMhJlhzjCcSA="
 
+# Web token for hidden web login (do not use!)
+WEB_TOKEN = "CzET4vdadNUFQ5JU"
+
 path = "./downloads/"
 
 PRESETS = {

@@ -1,6 +1,6 @@
 import getpass
 
-from redsea.tidal_api import TidalSessionFile, TidalRequestError, TidalMobileSession, TidalTvSession
+from redsea.tidal_api import TidalSessionFile, TidalRequestError, TidalMobileSession, TidalTvSession, TidalWebSession
 
 
 class RedseaSessionFile(TidalSessionFile):
@@ -38,6 +38,8 @@ class RedseaSessionFile(TidalSessionFile):
                 accesstoken = input('access_token/oAuthAccessToken (eyJhbGciOiJIUzI1NiJ9 ...): ')
                 refreshtoken = input('refresh_token/oAuthRefreshToken (eyJhbGciOiJIUzI1NiJ9 ...): ')
                 clientid = input('client_id/apiToken (Random numbers ...): ')
+        elif confirm.upper() == 'W':
+            device = 'web'
         else:
             device = ''
 
@@ -162,6 +164,8 @@ class RedseaSessionFile(TidalSessionFile):
                 device = '[MOBILE]'
             elif isinstance(self.sessions[s], TidalTvSession) and not mobile_only:
                 device = '[TV]'
+            elif isinstance(self.sessions[s], TidalWebSession):
+                device = '[WEB]'
             else:
                 device = '[DESKTOP]'
 
