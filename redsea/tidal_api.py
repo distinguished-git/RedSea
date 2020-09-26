@@ -113,8 +113,7 @@ class TidalApi(object):
         })
 
     def get_search_data(self, searchterm):
-        return self._get('search',
-                         params={'query': str(searchterm), 'offset': 0, 'limit': 10, 'includeContributors': 'true'})
+        return self._get('search', params={'query': str(searchterm), 'offset': 0, 'limit': 10, 'includeContributors': 'true'})
 
     def get_page(self, pageurl):
         return self._get('pages/' + pageurl, params={'deviceType': 'TV', 'locale': 'en_US', 'mediaFormats': 'SONY_360'})
@@ -677,7 +676,6 @@ class TidalTvSession(TidalSession):
             'Accept-Encoding': 'gzip',
             'User-Agent': 'TIDAL_ANDROID/1000 okhttp/3.13.1'
         }
-
 
 class TidalWebSession(TidalSession):
     def __init__(self, username, password, access_token, refresh_token, client_id):

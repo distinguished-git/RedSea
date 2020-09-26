@@ -4,6 +4,7 @@ import traceback
 import sys
 import os
 import re
+import urllib3
 
 import redsea.cli as cli
 
@@ -32,6 +33,7 @@ LOGO = """
 MEDIA_TYPES = {'t': 'track', 'p': 'playlist', 'a': 'album', 'r': 'artist', 'v': 'video'}
 
 def main():
+    urllib3.disable_warnings(urllib3.exceptions.InsecureRequestWarning)
     os.chdir(sys.path[0])
     # Get args
     args = cli.get_args()
@@ -455,6 +457,7 @@ def main():
 
                     # Catch file name errors
                     except OSError as e:
+                        print(e)
                         print("\tFile name too long or contains apostrophes")
                         file = open('failed_tracks.txt', 'a')
                         file.write(str(track['url']) + "\n")
