@@ -5,6 +5,10 @@ import os.path as path
 import re
 import base64
 import ffmpeg
+import binascii
+import shutil 
+import platform
+import subprocess
 
 import requests
 from urllib3.util.retry import Retry
@@ -15,7 +19,7 @@ from .decryption import decrypt_file, decrypt_security_token
 from .tagger import FeaturingFormat
 from .tidal_api import TidalApi, TidalRequestError
 from deezer.deezer import Deezer, APIError
-from .videodownloader import download_stream
+from .videodownloader import download_stream, download_file
 
 # Deezer API
 dz = Deezer()
@@ -197,49 +201,53 @@ class MediaDownloader(object):
             # Attempt to get stream URL
             # stream_data = self.get_stream_url(track_id, quality)
 
-            # Hacky way to get extension of file from URL
-            # ftype = None
-
+            DRM = False 
             playback_info = self.api.get_stream_url(track_id, preset['quality'])
-            if 'manifestMimeType' in playback_info:
+            if 'licenseSecurityToken' in playback_info:
+                DRM = True 
+                print("\tWarning: DRM has been detected. If you do not have the decryption key, do not use web login.")
+            elif 'manifestMimeType' in playback_info:
                 if playback_info['manifestMimeType'] == 'application/dash+xml':
                     raise AssertionError('\tPlease use a mobile session for the track ' + str(playback_info['trackId'])
                                          + ' in ' + str(playback_info['audioQuality']) + ' audio quality. This cannot '
                                                                                          'be downloaded with a TV '
-                                                                                         'session.\n')
+                                                                                         'session.\n')                
+                
+            if not DRM:
+                manifest = json.loads(base64.b64decode(playback_info['manifest']))
+                # Detect codec
+                print('\tCodec: ', end='')
+                if manifest['codecs'] == 'eac3':
+                    print('E-AC-3 JOC (Dolby Digital Plus with Dolby Atmos metadata)')
+                elif manifest['codecs'] == 'ac4':
+                    print('AC-4 (Dolby AC-4 with Dolby Atmos immersive stereo)')
+                elif manifest['codecs'] == 'mqa' and manifest['mimeType'] == 'audio/flac':
+                    print('FLAC (Free Lossless Audio Codec) with folded MQA (Master Quality Authenticated) metadata')
+                elif manifest['codecs'] == 'flac':
+                    print('FLAC (Free Lossless Audio Codec)')
+                elif manifest['codecs'] == 'alac':
+                    print('ALAC (Apple Lossless Audio Codec)')
+                elif manifest['codecs'] == 'mp4a.40.2':
+                    print('AAC (Advanced Audio Coding) with a bitrate of 320kb/s')
+                elif manifest['codecs'] == 'mp4a.40.5':
+                    print('AAC (Advanced Audio Coding) with a bitrate of 96kb/s')
+                else:
+                    print('Unknown')
 
-            manifest = json.loads(base64.b64decode(playback_info['manifest']))
-
-            # Detect codec
-            print('\tCodec: ', end='')
-            if manifest['codecs'] == 'eac3':
-                print('E-AC-3 JOC (Dolby Digital Plus with Dolby Atmos metadata)')
-            elif manifest['codecs'] == 'ac4':
-                print('AC-4 (Dolby AC-4 with Dolby Atmos immersive stereo)')
-            elif manifest['codecs'] == 'mqa' and manifest['mimeType'] == 'audio/flac':
-                print('FLAC (Free Lossless Audio Codec) with folded MQA (Master Quality Authenticated) metadata')
-            elif manifest['codecs'] == 'flac':
-                print('FLAC (Free Lossless Audio Codec)')
-            elif manifest['codecs'] == 'alac':
-                print('ALAC (Apple Lossless Audio Codec)')
-            elif manifest['codecs'] == 'mp4a.40.2':
-                print('AAC (Advanced Audio Coding) with a bitrate of 320kb/s')
-            elif manifest['codecs'] == 'mp4a.40.5':
-                print('AAC (Advanced Audio Coding) with a bitrate of 96kb/s')
-            else:
-                print('Unknown')
-
-            url = manifest['urls'][0]
-            if url.find('.flac?') == -1:
-                if url.find('.m4a?') == -1:
-                    if url.find('.mp4?') == -1:
-                        ftype = ''
+                url = manifest['urls'][0]
+                if url.find('.flac?') == -1:
+                    if url.find('.m4a?') == -1:
+                        if url.find('.mp4?') == -1:
+                            ftype = ''
+                        else:
+                            ftype = 'm4a'
                     else:
                         ftype = 'm4a'
                 else:
-                    ftype = 'm4a'
+                    ftype = 'flac'
+            #ftype needs to be changed to work with audio codecs instead when with web auth
             else:
-                ftype = 'flac'
+                ftype ='flac'
 
             if album_info['numberOfVolumes'] > 1:
                 track_path = path.join(disc_location, track_file + '.' + ftype)
@@ -252,7 +260,61 @@ class MediaDownloader(object):
 
             self.print_track_info(track_info, album_info)
 
-            try:
+            if DRM:
+                dash_mpd = base64.b64decode(playback_info['manifest']).decode('UTF-8')
+                
+                # Get playback link
+                pattern = re.compile(r'(?<=media=")[^"]+')
+                playback_link = pattern.findall(dash_mpd)[0].replace("amp;", "")
+
+                # Create album tmp folder
+                tmp_folder = os.path.join(album_location, 'tmp/')
+
+                if not os.path.isdir(tmp_folder):
+                    os.makedirs(tmp_folder)
+
+                pattern = re.compile(r'(?<= r=")[^"]+')
+                # Add 2?
+                length = int(pattern.findall(dash_mpd)[0]) + 3
+
+                # Download all chunk files from MPD
+                with open(album_location + '/encrypted.mp4','wb') as encrypted_file:    
+                    for i in range(length):
+                        link = playback_link.replace("$Number$", str(i))
+                        filename = os.path.join(tmp_folder, str(i).zfill(3) + '.mp4')
+                        download_file([link], 0, filename)
+                        with open(filename,'rb') as fd:
+                            shutil.copyfileobj(fd, encrypted_file)
+                        print(
+                        "\tDownload progress: {0:.0f}%".format(((i+1) / length) * 100),
+                        end='\r')
+                print()
+                os.chdir(album_location)
+
+                decryption_key = input("\tInput key (ID:key): ")
+                print("\tDecrypting m4a")
+                try:
+                    os.system('mp4decrypt --key {} encrypted.mp4 "{}"'.format(decryption_key, track_file + '.m4a'))
+                    ('tmp')
+                except Exception as e:
+                    print(e)
+                    print('mp4decrypt not found!')
+
+                temp_file = track_path
+                print("\tRemuxing m4a to FLAC")
+                (
+                    ffmpeg
+                        .input(track_file + '.m4a')
+                        .output(track_file + '.flac', acodec="copy", loglevel='warning')
+                        .overwrite_output()
+                        .run()
+                )
+                shutil.rmtree("tmp")
+                os.remove('encrypted.mp4')
+                os.remove(track_file + '.m4a')
+                os.chdir('../../')
+
+            if not DRM:
                 temp_file = self._dl_url(url, track_path)
 
                 if 'encryptionType' in manifest and manifest['encryptionType'] != 'NONE':
@@ -261,6 +323,7 @@ class MediaDownloader(object):
                         key, nonce = decrypt_security_token(manifest['keyId'])
                         decrypt_file(temp_file, key, nonce)
 
+            try:
                 aa_location = path.join(album_location, 'Cover.jpg')
                 if not path.isfile(aa_location):
                     try:

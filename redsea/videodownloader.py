@@ -12,7 +12,7 @@ MP4Tags._padding = 0
 
 
 def parse_master_playlist(masterurl):
-    content = str(requests.get(masterurl).content)
+    content = str(requests.get(masterurl, verify=False).content)
     pattern = re.compile(r"(?<=RESOLUTION=)[0-9]+x[0-9]+")
     resolution_list = pattern.findall(content)
     pattern = re.compile(r"(?<=http).+?(?=\\n)")
@@ -25,7 +25,7 @@ def parse_master_playlist(masterurl):
 
 
 def parse_playlist(url):
-    content = requests.get(url).content
+    content = requests.get(url, verify=False).content
     pattern = re.compile(r"(?<=http).+?(?=\\n)")
     plist = pattern.findall(str(content))
     urllist = []
@@ -40,7 +40,7 @@ def download_file(urllist, part, filename):
         # print('\tFile {} already exists, skipping.'.format(filename))
         return None
 
-    r = requests.get(urllist[part], stream=True)
+    r = requests.get(urllist[part], stream=True, verify=False)
     try:
         total = int(r.headers['content-length'])
     except KeyError:
@@ -70,7 +70,7 @@ def download_video_artwork(image_id, where):
     url = 'https://resources.tidal.com/images/{0}/{1}x{2}.jpg'.format(
         image_id.replace('-', '/'), 1280, 720)
 
-    r = requests.get(url, stream=True)
+    r = requests.get(url, stream=True, verify=False)
 
     try:
         total = int(r.headers['content-length'])

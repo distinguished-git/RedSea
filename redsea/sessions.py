@@ -1,6 +1,6 @@
 import getpass
 
-from redsea.tidal_api import TidalSessionFile, TidalRequestError, TidalMobileSession, TidalTvSession
+from redsea.tidal_api import TidalSessionFile, TidalRequestError, TidalMobileSession, TidalTvSession, TidalWebSession
 
 
 class RedseaSessionFile(TidalSessionFile):
@@ -21,8 +21,8 @@ class RedseaSessionFile(TidalSessionFile):
         Returns True if successful
         '''
         # confirm = input('Do you want to use the new TV authorization (needed for E-AC-3 JOC)? [y/N]? ')
-        confirm = input('Which login method do you want to use: TV (needed for MQA, E-AC-3),'
-                        'Mobile (needed for MQA, AC-4) or Desktop (FLAC only)? [t/m/d]? ')
+        confirm = input('Which login method do you want to use: TV (needed for MQA, E-AC-3), '
+                        'Mobile (needed for MQA, AC-4), Desktop (MQA) or Web (FLAC only, encrypted so nearly useless)? [t/m/d/w]? ')
 
         token_confirm = 'N'
         accesstoken = ''
@@ -33,16 +33,18 @@ class RedseaSessionFile(TidalSessionFile):
             device = 'tv'
         elif confirm.upper() == 'M':
             device = 'mobile'
-            token_confirm = input('Do you want to enter your access_token and refresh_token [y/N]? ')
+            token_confirm = input('Do you want to enter your access_token, refresh_token and client_id [y/N]? ')
             if token_confirm.upper() == 'Y':
                 accesstoken = input('access_token/oAuthAccessToken (eyJhbGciOiJIUzI1NiJ9 ...): ')
                 refreshtoken = input('refresh_token/oAuthRefreshToken (eyJhbGciOiJIUzI1NiJ9 ...): ')
                 clientid = input('client_id/apiToken (Random numbers ...): ')
+        elif confirm.upper() == 'W':
+            device = 'web'
         else:
             device = ''
 
         while True:
-            if device != 'tv' and token_confirm == 'N':
+            if device != 'tv' and token_confirm.upper() == 'N':
                 print('LOGIN: Enter your Tidal username and password:\n')
                 username = input('Username: ')
                 password = getpass.getpass('Password: ')
@@ -162,6 +164,8 @@ class RedseaSessionFile(TidalSessionFile):
                 device = '[MOBILE]'
             elif isinstance(self.sessions[s], TidalTvSession) and not mobile_only:
                 device = '[TV]'
+            elif isinstance(self.sessions[s], TidalWebSession):
+                device = '[WEB]'
             else:
                 device = '[DESKTOP]'
 

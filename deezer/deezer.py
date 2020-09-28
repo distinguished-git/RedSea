@@ -15,6 +15,7 @@ USER_AGENT_HEADER = "Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, 
 
 class Deezer:
     def __init__(self):
+        requests.packages.urllib3.disable_warnings(requests.packages.urllib3.exceptions.InsecureRequestWarning)
         self.api_url = "http://www.deezer.com/ajax/gw-light.php"
         self.legacy_api_url = "https://api.deezer.com/"
         self.http_headers = {
@@ -29,7 +30,7 @@ class Deezer:
         self.selectedAccount = 0
         self.session = requests.Session()
         self.logged_in = False
-        self.session.post("https://www.deezer.com/", headers=self.http_headers)
+        self.session.post("https://www.deezer.com/", headers=self.http_headers, verify=False)
         self.guest_sid = self.session.cookies.get('sid')
 
     def get_token(self):
@@ -49,7 +50,8 @@ class Deezer:
                 },
                 timeout=30,
                 json={'sng_id': sng_id},
-                headers=self.http_headers
+                headers=self.http_headers,
+                verify=False
             )
         except:
             time.sleep(2)
@@ -75,7 +77,8 @@ class Deezer:
                 },
                 timeout=30,
                 json=args,
-                headers=self.http_headers
+                headers=self.http_headers,
+                verify=False
             )
             result_json = result.json()
         except:
@@ -93,7 +96,8 @@ class Deezer:
                 self.legacy_api_url + method,
                 params=args,
                 headers=self.http_headers,
-                timeout=30
+                timeout=30,
+                verify=False
             )
             result_json = result.json()
         except:
@@ -117,7 +121,8 @@ class Deezer:
                 'checkFormLogin': check_form_login['results']['checkFormLogin'],
                 'reCaptchaToken': re_captcha_token
             },
-            headers={'Content-Type': 'application/x-www-form-urlencoded; charset=UTF-8', **self.http_headers}
+            headers={'Content-Type': 'application/x-www-form-urlencoded; charset=UTF-8', **self.http_headers},
+            verify=False
         )
         if 'success' not in login.text:
             self.logged_in = False
@@ -550,7 +555,7 @@ class Deezer:
 
     def stream_track(self, track_id, url, stream):
         try:
-            request = requests.get(url, headers=self.http_headers, stream=True, timeout=30)
+            request = requests.get(url, headers=self.http_headers, stream=True, timeout=30, verify=False)
         except:
             time.sleep(2)
             return self.stream_track(track_id, url, stream)
