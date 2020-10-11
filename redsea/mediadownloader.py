@@ -147,6 +147,9 @@ class MediaDownloader(object):
     def type_from_id(self, id):
         return self.api.get_type_from_id(id)
 
+    def credits_from_album(self, album_id):
+        return self.api.get_credits(album_id)
+
     def playlist_from_id(self, id):
         return self.api.get_playlist(id)
 
@@ -392,6 +395,26 @@ class MediaDownloader(object):
                         os.remove(temp_file)
                         temp_file = conv_file
                         ftype = "m4a"
+
+                # Get credits from album id
+                if 'save_credits_txt' in preset:
+                    if preset['save_credits_txt']:
+                        print('\tSaving credits to file')
+                        album_credits = self.credits_from_album(str(album_info['id']))
+                        track_credits = album_credits['items'][track_info['trackNumber']-1]['credits']
+
+                        data = ''
+                        for i in range(len(track_credits)):
+                            data += track_credits[i]['type'] + ': '
+                            contributors = track_credits[i]['contributors']
+                            for j in range(len(contributors)):
+                                if j != len(contributors) - 1:
+                                    data += contributors[j]['name'] + ', '
+                                else:
+                                    data += contributors[j]['name'] + '\n'
+
+                        with open((os.path.splitext(track_path)[0] + '.txt'), 'w') as f:
+                            f.write(data)
 
                 # Get lyrics from Deezer using deemix (https://codeberg.org/RemixDev/deemix)
                 lyrics = None

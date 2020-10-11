@@ -7,3 +7,4 @@ downloads/
 .idea/
 settings.py
 node_modules/
+failed_tracks.txt

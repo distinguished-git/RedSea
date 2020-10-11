@@ -118,6 +118,14 @@ class TidalApi(object):
     def get_page(self, pageurl):
         return self._get('pages/' + pageurl, params={'deviceType': 'TV', 'locale': 'en_US', 'mediaFormats': 'SONY_360'})
 
+    def get_credits(self, album_id):
+        return self._get('albums/' + album_id + '/items/credits', params={
+            'replace': True,
+            'offset': 0,
+            'limit': 50,
+            'includeContributors': True
+        })
+
     def get_playlist_items(self, playlist_id):
         result = self._get('playlists/' + playlist_id + '/items', {
             'offset': 0,
