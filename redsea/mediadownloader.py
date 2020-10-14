@@ -346,9 +346,17 @@ class MediaDownloader(object):
                         }
 
                         r = s.get('https://itunes.apple.com/search', params=params)
-                        # Get first album cover result
-                        album_cover = r.json()['results'][0]['artworkUrl100']
-                        # Get high resolution album cover
+                        r = r.json()
+                        album_cover = None
+
+                        for i in range(len(r['results'])):
+                            if album_info['title'] == r['results'][i]['collectionName']:
+                                # Get high resolution album cover
+                                album_cover = r['results'][i]['artworkUrl100']
+                                break
+
+                        if album_cover is None:
+                            raise Exception
 
                         compressed = 'bb'
                         if 'uncompressed_artwork' in preset:
