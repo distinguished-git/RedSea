@@ -81,6 +81,16 @@ class MediaDownloader(object):
 
     def _sanitise_name(self, name):
         name = re.sub(r'[\\\/*?"<>|]', '', str(name))
+
+        # Check file length
+        if len(name) > 230:
+            name = name[:230]
+
+        # Check last character is space
+        if len(name) > 0:
+            if name[len(name)-1] == ' ':
+                name = name[:len(name)-1]
+
         return re.sub(r'[:]', ' - ', name)
 
     def _normalise_info(self, track_info, album_info, use_album_artists=False):
@@ -421,8 +431,9 @@ class MediaDownloader(object):
                                 else:
                                     data += contributors[j]['name'] + '\n'
 
-                        with open((os.path.splitext(track_path)[0] + '.txt'), 'w') as f:
-                            f.write(data)
+                        if data != '':
+                            with open((os.path.splitext(track_path)[0] + '.txt'), 'w') as f:
+                                f.write(data)
 
                 # Get lyrics from Deezer using deemix (https://codeberg.org/RemixDev/deemix)
                 lyrics = None
