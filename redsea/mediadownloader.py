@@ -215,8 +215,10 @@ class MediaDownloader(object):
             # stream_data = self.get_stream_url(track_id, quality)
 
             DRM = False 
-            playback_info = self.api.get_stream_url(track_id, preset['quality'])
-            if 'licenseSecurityToken' in playback_info:
+            playback_info = self.api.get_stream_url(track_id, preset['quality'])          
+                
+            manifest_unparsed = base64.b64decode(playback_info['manifest']).decode('UTF-8')
+            if 'ContentProtection' in manifest_unparsed:
                 DRM = True 
                 print("\tWarning: DRM has been detected. If you do not have the decryption key, do not use web login.")
             elif 'manifestMimeType' in playback_info:
@@ -224,10 +226,10 @@ class MediaDownloader(object):
                     raise AssertionError('\tPlease use a mobile session for the track ' + str(playback_info['trackId'])
                                          + ' in ' + str(playback_info['audioQuality']) + ' audio quality. This cannot '
                                                                                          'be downloaded with a TV '
-                                                                                         'session.\n')                
+                                                                                         'session for now.\n')
                 
             if not DRM:
-                manifest = json.loads(base64.b64decode(playback_info['manifest']))
+                manifest = json.loads(manifest_unparsed)
                 # Detect codec
                 print('\tCodec: ', end='')
                 if manifest['codecs'] == 'eac3':
@@ -274,11 +276,10 @@ class MediaDownloader(object):
             self.print_track_info(track_info, album_info)
 
             if DRM:
-                dash_mpd = base64.b64decode(playback_info['manifest']).decode('UTF-8')
-                
+                manifest = manifest_unparsed
                 # Get playback link
                 pattern = re.compile(r'(?<=media=")[^"]+')
-                playback_link = pattern.findall(dash_mpd)[0].replace("amp;", "")
+                playback_link = pattern.findall(manifest)[0].replace("amp;", "")
 
                 # Create album tmp folder
                 tmp_folder = os.path.join(album_location, 'tmp/')
@@ -288,7 +289,7 @@ class MediaDownloader(object):
 
                 pattern = re.compile(r'(?<= r=")[^"]+')
                 # Add 2?
-                length = int(pattern.findall(dash_mpd)[0]) + 3
+                length = int(pattern.findall(manifest)[0]) + 3
 
                 # Download all chunk files from MPD
                 with open(album_location + '/encrypted.mp4','wb') as encrypted_file:    
