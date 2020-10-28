@@ -420,21 +420,23 @@ class MediaDownloader(object):
                     if preset['save_credits_txt']:
                         print('\tSaving credits to file')
                         album_credits = self.credits_from_album(str(album_info['id']))
-                        track_credits = album_credits['items'][track_info['trackNumber']-1]['credits']
+                        try:
+                            track_credits = album_credits['items'][track_info['trackNumber']-1]['credits']
+                            data = ''
+                            for i in range(len(track_credits)):
+                                data += track_credits[i]['type'] + ': '
+                                contributors = track_credits[i]['contributors']
+                                for j in range(len(contributors)):
+                                    if j != len(contributors) - 1:
+                                        data += contributors[j]['name'] + ', '
+                                    else:
+                                        data += contributors[j]['name'] + '\n'
 
-                        data = ''
-                        for i in range(len(track_credits)):
-                            data += track_credits[i]['type'] + ': '
-                            contributors = track_credits[i]['contributors']
-                            for j in range(len(contributors)):
-                                if j != len(contributors) - 1:
-                                    data += contributors[j]['name'] + ', '
-                                else:
-                                    data += contributors[j]['name'] + '\n'
-
-                        if data != '':
-                            with open((os.path.splitext(track_path)[0] + '.txt'), 'w') as f:
-                                f.write(data)
+                            if data != '':
+                                with open((os.path.splitext(track_path)[0] + '.txt'), 'w') as f:
+                                    f.write(data)
+                        except IndexError:
+                            pass
 
                 # Get lyrics from Deezer using deemix (https://codeberg.org/RemixDev/deemix)
                 lyrics = None

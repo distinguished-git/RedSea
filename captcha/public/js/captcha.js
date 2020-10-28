@@ -5,6 +5,7 @@ const path = require('path');
 
 
 let captchaPage = fs.readFileSync(path.join(__dirname, '..', 'html', 'captcha.html'), 'utf8');
+let count = 0;
 
 
 module.exports = {
@@ -12,8 +13,10 @@ module.exports = {
         // registerProtocol must be called before callback can set
         // so this is just a placeholder for the real callback function
         console.log("'response': '" + data + "'");
-        // if it gets a response close the app
-        app.exit(0)
+        // if it recieves the second response, close the app
+        if (count === 1)
+            app.exit(0);
+        count += 1;
     },
     registerScheme: function () {
         protocol.registerSchemesAsPrivileged([{ scheme: 'cap', privileges: { standard: true, secure: true, supportFetchAPI: true } }])
