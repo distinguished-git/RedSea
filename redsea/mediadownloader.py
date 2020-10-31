@@ -232,6 +232,8 @@ class MediaDownloader(object):
                 manifest = json.loads(manifest_unparsed)
                 # Detect codec
                 print('\tCodec: ', end='')
+                if manifest['codecs'] == 'mha1':
+                    print('MPEG-H 3D Audio (Sony 360 Reality Audio)')
                 if manifest['codecs'] == 'eac3':
                     print('E-AC-3 JOC (Dolby Digital Plus with Dolby Atmos metadata)')
                 elif manifest['codecs'] == 'ac4':

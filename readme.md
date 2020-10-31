@@ -18,14 +18,14 @@ API implementation - it is contained in `redsea/tidal_api.py` and only requires 
 
 Choosing login types and client IDs
 -----------------------------------
-* To get the EAC-3 codec version of Dolby Atmos Music, the TV sign in must be used with the client ID and secret of one of the supported Android TVs (full list below) (bring your own TV client ID and secret)
+* To get the E-AC-3 codec version of Dolby Atmos Music, the TV sign in must be used with the client ID and secret of one of the supported Android TVs (full list below) (now included)
 * To get the AC-4 codec version of Dolby Atmos music, the Mobile sign in must be used with the client ID of one of the supported phones (default mobile works)
 * To get MQA, use literally anything that is not the browser, nearly all client IDs work. (In this case change the client ID of the desktop login) (bring your own anything (TV, mobile, desktop))
 * To get ALAC without conversion, use the client ID of an iOS device, or the optional desktop token included from macOS (comment out the default FLAC supporting one, and uncomment the ALAC one) (secondary desktop works, or bring your own mobile)
 * To get 360, use the client ID of a supported Android or iOS device (nearly all support it anyway, so that's easy) (default mobile works)
 
 Client IDs provided by default:
-* TV: FireTV without EAC-3 support
+* TV: FireTV with E-AC-3 (Dolby Atmos) and MQA support
 * Mobile: Default has AC-4 support (which also supports MQA by extension). There is also another one which only supports MQA without AC-4 optionally (commented out)
 * Desktop: Neither of the included ones support MQA! You must replace it with your own if you want MQA support! Default token can get FLACs only, whereas the optional one can get ALACs only (both are also able to get AAC)
 * Browser: Is completely unsupported for now, though why would you want it anyway?

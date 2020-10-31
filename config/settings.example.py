@@ -52,8 +52,8 @@ TOKEN = 'wc8j_yBJd20zOmx0'      # FLAC only
 MOBILE_TOKEN = "dN2N95wCyEBTllu4"  # Dolby Atmos AC-4 Token
 
 # The TV_TOKEN and the line below (TV_SECRET) are tied together, so un-/comment both.
-TV_TOKEN = "LXujKdmnc6QtydvY"  # FireTV
-TV_SECRET = "7iM9rMsPlM2xDY5AiToS7XgVVnG28bjsMhJlhzjCcSA="
+TV_TOKEN = "aR7gUaTK1ihpXOEP"  # FireTV Dolby Atmos E-AC-3 + MQA
+TV_SECRET = "eVWBEkuL2FCjxgjOkR3yK0RYZEbcrMXRc2l8fU3ZCdE="
 
 # Web token for hidden web login (do not use!)
 WEB_TOKEN = "CzET4vdadNUFQ5JU"
