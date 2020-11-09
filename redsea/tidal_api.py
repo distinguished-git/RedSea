@@ -251,16 +251,16 @@ class SessionFormats:
 
         for id in [self.dolby_trackid, self.sony_trackid]:
             playback_info = api.get_stream_url(id, ['LOW'])
-            if 'licenseSecurityToken' not in playback_info:
-                manifest = json.loads(base64.b64decode(playback_info['manifest']))
-                self.formats[manifest['codecs']] = True
+            manifest_unparsed = base64.b64decode(playback_info['manifest']).decode('UTF-8')
+            if 'ContentProtection' not in manifest_unparsed:
+                self.formats[json.loads(manifest_unparsed)['codecs']] = True
 
         for i in range(len(self.quality)):
             playback_info = api.get_stream_url(self.mqa_trackid, [self.quality[i]])
 
-            if 'licenseSecurityToken' not in playback_info:
-                manifest = json.loads(base64.b64decode(playback_info['manifest']))
-                self.formats[manifest['codecs']] = True
+            manifest_unparsed = base64.b64decode(playback_info['manifest']).decode('UTF-8')
+            if 'ContentProtection' not in manifest_unparsed:
+                self.formats[json.loads(manifest_unparsed)['codecs']] = True
 
     def print_fomats(self):
         table = prettytable.PrettyTable()
