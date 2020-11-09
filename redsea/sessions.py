@@ -1,7 +1,6 @@
 import getpass
 
-from redsea.tidal_api import TidalSessionFile, TidalRequestError, TidalMobileSession, TidalTvSession, TidalWebSession
-
+from redsea.tidal_api import TidalSessionFile, TidalRequestError, TidalMobileSession, TidalTvSession, TidalWebSession, SessionFormats
 
 class RedseaSessionFile(TidalSessionFile):
     '''
@@ -173,6 +172,7 @@ class RedseaSessionFile(TidalSessionFile):
                 continue
 
             print('   [{}]{} {} | {}'.format(self.sessions[s].country_code, device, self.sessions[s].username, s))
+            session_format = SessionFormats(self.sessions[s]).print_fomats()
 
         print('')
         if self.default is not None:

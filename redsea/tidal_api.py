@@ -12,6 +12,7 @@ from datetime import datetime, timedelta
 import urllib3
 import time
 import sys
+import prettytable
 
 import requests
 from urllib3.util.retry import Retry
@@ -19,6 +20,17 @@ from requests.adapters import HTTPAdapter
 from subprocess import Popen, PIPE
 
 from config.settings import TOKEN, MOBILE_TOKEN, TV_TOKEN, TV_SECRET, WEB_TOKEN, SHOWAUTH
+
+technical_names = {
+    'eac3': 'E-AC-3 JOC (Dolby Digital Plus with Dolby Atmos, with 5.1 bed)',
+    'mha1': 'MPEG-H 3D Audio (Sony 360 Reality Audio)',
+    'ac4': 'AC-4 IMS (Dolby AC-4 with Dolby Atmos immersive stereo)',
+    'mqa': 'MQA (Master Quality Authenticated) in FLAC container',
+    'flac': 'FLAC (Free Lossless Audio Codec)',
+    'alac': 'ALAC (Apple Lossless Audio Codec)',
+    'mp4a.40.2': 'AAC 320 (Advanced Audio Coding) with a bitrate of 320kb/s',
+    'mp4a.40.5': 'AAC 96 (Advanced Audio Coding) with a bitrate of 96kb/s'
+}
 
 
 class TidalRequestError(Exception):
@@ -211,6 +223,55 @@ class TidalApi(object):
     def get_album_artwork_url(cls, album_id, size=1280):
         return 'https://resources.tidal.com/images/{0}/{1}x{1}.jpg'.format(
             album_id.replace('-', '/'), size)
+
+
+class SessionFormats:
+    def __init__(self, session):
+        self.mqa_trackid = '91950969'
+        self.dolby_trackid = '131069353'
+        self.sony_trackid = '142292058'
+
+        self.quality = ['HI_RES', 'LOSSLESS', 'HIGH', 'LOW']
+
+        self.formats = {
+            'eac3': False,
+            'mha1': False,
+            'ac4': False,
+            'mqa': False,
+            'flac': False,
+            'alac': False,
+            'mp4a.40.2': False,
+            'mp4a.40.5': False
+        }
+
+        self.check_formats(session)
+
+    def check_formats(self, session):
+        api = TidalApi(session)
+
+        for id in [self.dolby_trackid, self.sony_trackid]:
+            playback_info = api.get_stream_url(id, ['LOW'])
+            if 'licenseSecurityToken' not in playback_info:
+                manifest = json.loads(base64.b64decode(playback_info['manifest']))
+                self.formats[manifest['codecs']] = True
+
+        for i in range(len(self.quality)):
+            playback_info = api.get_stream_url(self.mqa_trackid, [self.quality[i]])
+
+            if 'licenseSecurityToken' not in playback_info:
+                manifest = json.loads(base64.b64decode(playback_info['manifest']))
+                self.formats[manifest['codecs']] = True
+
+    def print_fomats(self):
+        table = prettytable.PrettyTable()
+        table.field_names = ['Codec', 'Technical name', 'Supported']
+        table.align = 'l'
+        for format in self.formats:
+            table.add_row([format, technical_names[format], self.formats[format]])
+
+        string_table = '\t' + table.__str__().replace('\n', '\n\t')
+        print(string_table)
+        print('')
 
 
 class ReCaptcha(object):
