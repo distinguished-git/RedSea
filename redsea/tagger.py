@@ -121,7 +121,7 @@ class Tagger(object):
             elif track_info['audioQuality'] == 'HI_RES':
                 tagger['quality'] = "Master Quality Authenticated"
             else:
-                tagger['quality'] = "[FLAC]"
+                tagger['quality'] = "FLAC (16-bit 44.1k)"
 
             if 'explicit' in album_info:
                 tagger['explicit'] = 'Explicit' if album_info['explicit'] else 'Clean'
