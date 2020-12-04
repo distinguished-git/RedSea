@@ -51,4 +51,5 @@ metaflac --add-replay-gain *.flac
 
 find "$(pwd)" -iname "*.flac" -o -iname "*.lrc" | sed -e "s/\/tmp\/ramdisk\/tidal\//\//" > include.txt
 gclone move --size-only /tmp/ramdisk/tidal --include-from "include.txt" union:/Music --progress --transfers 20
-
+cd /tmp/ramdisk/RedSea
+rm -rf "$DIRNAME"
