@@ -1,3 +1,5 @@
+#!/bin/bash
+
 echo "found: $1"
 DIRNAME=$( dirname "$1" )
 
