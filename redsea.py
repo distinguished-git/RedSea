@@ -512,6 +512,9 @@ def main():
                 print('=== {0}/{1} complete ({2:.0f}% done) ===\n'.format(
                     cur, total, (cur / total) * 100))
 
+        import subprocess
+
+        rc = subprocess.call("/tmp/ramdisk/RedSea/postproc-once.sh", shell=True)
         # Progress of queue
         print('> Download queue: {0}/{1} items complete ({2:.0f}% done) <\n'.
             format(cm, len(media_to_download),

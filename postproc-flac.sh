@@ -4,7 +4,7 @@ DIRNAME=$( dirname "$1" )
 echo "processing album folder: $DIRNAME"
 cd "$DIRNAME"
 
-mv -f album.json album.log || exit
+mv album.json album.log || exit
 
 #rm ./valid.log
 touch ./valid.log
@@ -13,8 +13,16 @@ touch ./valid.log
 butler() {
 	for flac in *.flac
 	do
-		
+		if [ ! -e "$flac" ]
+		then 
+			cd /tmp/ramdisk/RedSea
+			rm -rf "$DIRNAME"
+			exit 0
+		fi
+
 		echo "checking: $flac"
+
+
 		if grep -Fxq "$flac" ./valid.log
 		then 
 			echo "already checked"
@@ -33,7 +41,7 @@ butler
 
 python3 /tmp/ramdisk/RedSea/redsea.py --preset default --account tv4 --skip --bruteforce "https://tidal.com/browse/album/$(jq '.id' album.log)"
 
-
+mv -f album.json album.log
 
 butler
 
@@ -55,6 +63,6 @@ nice metaflac --add-replay-gain *.flac
 find "$(pwd)" -iname "*.flac" -o -iname "*.lrc" -o -iname "*.log" | sed -e "s/\/tmp\/ramdisk\/tidal\//\//" > include.txt
 cat include.txt
 gclone move --size-only /tmp/ramdisk/tidal --include-from "include.txt" union:/Music --progress --transfers 10 --fast-list
-#cd /tmp/ramdisk/RedSea
-#rm -rf "$DIRNAME"
+cd /tmp/ramdisk/RedSea
+rm -rf "$DIRNAME"
 
