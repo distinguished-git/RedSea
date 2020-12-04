@@ -45,7 +45,7 @@ do
 	if [ -e "$TXTFILE" ]
 	then
 	    metaflac --import-tags-from "$TXTFILE" "$flac"
-	    rm -f $TXTFILE
+	    rm -f "$TXTFILE"
 	fi
 done
 
@@ -55,6 +55,6 @@ nice metaflac --add-replay-gain *.flac
 find "$(pwd)" -iname "*.flac" -o -iname "*.lrc" -o -iname "*.log" | sed -e "s/\/tmp\/ramdisk\/tidal\//\//" > include.txt
 cat include.txt
 gclone move --size-only /tmp/ramdisk/tidal --include-from "include.txt" union:/Music --progress --transfers 10 --fast-list
-cd /tmp/ramdisk/RedSea
-rm -rf "$DIRNAME"
+#cd /tmp/ramdisk/RedSea
+#rm -rf "$DIRNAME"
 

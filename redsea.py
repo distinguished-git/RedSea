@@ -200,7 +200,7 @@ def main():
                     elif song['audioQuality'] == 'HI_RES':
                         specialtag = "Master Quality Authenticated"
                     else:
-                        specialtag = "[FLAC]"
+                        specialtag = "FLAC 44.1k 16bit"
                 else:
                     specialtag = "[" + song['quality'].replace('MP4_', '') + "]"
 
