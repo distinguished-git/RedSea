@@ -1,6 +1,8 @@
 DIRNAME="$1"
 
+echo "processing album folder: $DIRNAME"
 cd "$DIRNAME"
+
 
 touch ./valid.log
 
@@ -9,7 +11,7 @@ butler() {
 	for flac in *.flac
 	do
 		
-		echo "$flac"
+		echo "checking: $flac"
 		if grep -Fxq "$flac" ./valid.log
 		then 
 			echo "already checked"
