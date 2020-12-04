@@ -49,5 +49,5 @@ done
 metaflac --add-replay-gain *.flac
 
 
-gclone move /tmp/ramdisk/tidal --include "$DIRNAME/*.{flac,lrc}"
+gclone move --size-only /tmp/ramdisk/tidal --include "$DIRNAME/*.{flac,lrc}" union:/Music --progress --transfers 20
 
