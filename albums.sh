@@ -1,5 +1,5 @@
 cat albums.txt | while read line 
 do
-	echo "https://listen.tidal.com/album/$line"
-   ./postproc.sh "https://listen.tidal.com/album/$line"
+	echo "https://tidal.com/browse/album/$line"
+   ./postproc.sh "https://tidal.com/browse/album/$line"
 done

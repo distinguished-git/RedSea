@@ -3,6 +3,15 @@ ALBUM="$1"
 python3 /tmp/ramdisk/RedSea/redsea.py --preset default --account tv4 --skip --bruteforce "https://tidal.com/browse/album/$ALBUM"
 
 
+
+
+#delete corrupt flacs
+find "/tmp/ramdisk/tidal" -iname "album.json" -exec "/tmp/ramdisk/RedSea/postproc-flac.sh" "{}" \;
+
+
+
+
+exit
 DIR="$(pwd)"
 screen -dmS dnf sudo dnf install -y jq flac
 if ! bpm-tag -h
@@ -17,10 +26,4 @@ then
 	cd "$DIR"
 	rm -rf /tmp/install-bpm-tools
 fi
-
-
-
-#delete corrupt flacs
-find "/tmp/ramdisk/tidal" -iname "album.json" -exec "/tmp/ramdisk/RedSea/postproc-flac.sh" "{}" \;
-
 
