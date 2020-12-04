@@ -5,7 +5,7 @@ echo "processing album folder: $DIRNAME"
 cd "$DIRNAME"
 
 
-#rm ./valid.log
+rm ./valid.log
 touch ./valid.log
 
 
