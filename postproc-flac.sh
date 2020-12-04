@@ -5,6 +5,7 @@ echo "processing album folder: $DIRNAME"
 cd "$DIRNAME"
 
 
+#rm ./valid.log
 touch ./valid.log
 
 
@@ -16,22 +17,23 @@ butler() {
 		if grep -Fxq "$flac" ./valid.log
 		then 
 			echo "already checked"
-			exit 0
+		else
+			if flac --test --warnings-as-errors --silent "$flac" ; 
+			then
+				echo "$flac" >> ./valid.log
+				bpm-tag "$flac"
+			else
+				rm -f "$flac"
+			fi
 		fi
 
-		# if there's a problem with the flac file
-		if flac --test --warnings-as-errors --silent "$flac" ; 
-		then
-			echo "$flac" >> ./valid.log
 
-			TXTFILE="$(echo "$flac" | sed "s/\.flac/\.txt/")"
-			if [ -e $TXTFILE ]
-			then
-			    metaflac --import-tags-from "$TXTFILE" "$flac"
-			    rm -f $TXTFILE
-			fi
-		else
-			rm -f "$flac"
+		TXTFILE="$(echo "$flac" | sed "s/\.flac/\.txt/")"
+		echo "checking for $TEXTFILE"
+		if [ -e "$TXTFILE" ]
+		then
+		    metaflac --import-tags-from "$TXTFILE" "$flac"
+		    rm -f $TXTFILE
 		fi
 	done
 }
@@ -42,4 +44,4 @@ python3 /tmp/ramdisk/RedSea/redsea.py --preset default --account tv4 --skip "htt
 
 butler
 
-flac --replay-gain --keep-foreign-metadata *.flac
+metaflac --add-replay-gain *.flac
