@@ -4,7 +4,7 @@ DIRNAME=$( dirname "$1" )
 echo "processing album folder: $DIRNAME"
 cd "$DIRNAME"
 
-mv album.json album.log
+mv -f album.json album.log || exit
 
 #rm ./valid.log
 touch ./valid.log
