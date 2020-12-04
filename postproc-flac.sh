@@ -34,4 +34,26 @@ butler
 python3 /tmp/ramdisk/RedSea/redsea.py --preset default --account tv4 --skip --bruteforce "https://tidal.com/browse/album/$(jq '.id' album.log)"
 
 
-screen -dmS flac2 /tmp/ramdisk/RedSea/postproc-flac2.sh
+
+butler
+
+for flac in *.flac
+do
+	bpm-tag "$flac"
+	TXTFILE="$(echo "$flac" | sed "s/\.flac/\.txt/")"
+	echo "checking for $TXTFILE"
+	if [ -e "$TXTFILE" ]
+	then
+	    metaflac --import-tags-from "$TXTFILE" "$flac"
+	    rm -f $TXTFILE
+	fi
+done
+
+nice metaflac --add-replay-gain *.flac
+
+
+find "$(pwd)" -iname "*.flac" -o -iname "*.lrc" -o -iname "*.log" | sed -e "s/\/tmp\/ramdisk\/tidal\//\//" > include.txt
+gclone move --size-only /tmp/ramdisk/tidal --include-from "include.txt" union:/Music --progress --transfers 10 --fast-list
+cd /tmp/ramdisk/RedSea
+rm -rf "$DIRNAME"
+
