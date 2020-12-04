@@ -1,6 +1,4 @@
-ALBUM="$1"
-
-python3 /tmp/ramdisk/RedSea/redsea.py --preset default --account tv4 --skip --bruteforce "https://tidal.com/browse/album/$ALBUM"
+python3 /tmp/ramdisk/RedSea/redsea.py --preset default --account tv4 --skip --bruteforce "$1"
 
 
 
