@@ -1,5 +1,7 @@
+DIRNAME0="$0"
 DIRNAME="$1"
 
+echo "0: $DIRNAME0"
 echo "processing album folder: $DIRNAME"
 cd "$DIRNAME"
 
