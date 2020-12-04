@@ -140,16 +140,16 @@ def main():
             item = items[i]
 
             if item['audioModes'] == ['DOLBY_ATMOS']:
-                specialtag = " [Dolby Atmos]"
+                specialtag = "Dolby Atmos (E-AC-3)"
             elif item['audioModes'] == ['SONY_360RA']:
-                specialtag = " [360 Reality Audio]"
+                specialtag = "Sony 360 Reality Audio"
             else:
-                specialtag = ""
+                specialtag = "FLAC"
 
             if item['explicit']:
-                explicittag = " [E]"
+                explicittag = "Explicit"
             else:
-                explicittag = ""
+                explicittag = "Clean"
 
             date = " (" + item['streamStartDate'].split('T')[0] + ")"
 
@@ -194,20 +194,20 @@ def main():
 
                 if searchtype != 'videos':
                     if song['audioModes'] == ['DOLBY_ATMOS']:
-                        specialtag = " [Dolby Atmos]"
+                        specialtag = "Dolby Atmos (E-AC-3)"
                     elif song['audioModes'] == ['SONY_360RA']:
-                        specialtag = " [360 Reality Audio]"
+                        specialtag = "Sony 360 Reality Audio"
                     elif song['audioQuality'] == 'HI_RES':
-                        specialtag = " [MQA]"
+                        specialtag = "Master Quality Authenticated"
                     else:
-                        specialtag = ""
+                        specialtag = "[FLAC]"
                 else:
-                    specialtag = " [" + song['quality'].replace('MP4_', '') + "]"
+                    specialtag = "[" + song['quality'].replace('MP4_', '') + "]"
 
                 if song['explicit']:
-                    explicittag = " [E]"
+                    explicittag = "Explicit"
                 else:
-                    explicittag = ""
+                    explicittag = "Clean"
 
                 print(str(i + 1) + ") " + str(song['title']) + " - " + str(
                     song['artists'][0]['name']) + explicittag + specialtag)
@@ -443,6 +443,17 @@ def main():
                         break
 
                     # Catch quality error
+#                    except AssertionError as e:
+#                        print("\t" + str(e))
+#                        traceback.print_exc()
+#                        break
+
+                    # Catch quality error
+                    except TidalError as e:
+                        print("\t" + str(e))
+                        traceback.print_exc()
+                        break
+
                     except ValueError as e:
                         print("\t" + str(e))
                         traceback.print_exc()
@@ -494,6 +505,7 @@ def main():
                         # Skip
                         else:
                             print(str(e) + '. Skipping..')
+                            break
 
                 # Progress of current track
                 cur += 1

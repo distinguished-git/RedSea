@@ -82,7 +82,7 @@ class Tagger(object):
                 tagger['discnumber'] = str(track_info['volumeNumber'])
             if album_info['releaseDate']:
                 # TODO: less hacky way of getting the year?
-                tagger['date'] = str(album_info['releaseDate'][:4])
+                tagger['date'] = str(album_info['releaseDate'])                
             if album_info['upc'] and track_type == 'm4a':
                 tagger['upc'] = bytes(album_info['upc'], encoding="ascii")
 
@@ -107,6 +107,7 @@ class Tagger(object):
                 tagger['explicit'] = b'\x01' if track_info['explicit'] else b'\x02'
             elif track_type == 'flac':
                 tagger['ITUNESADVISORY'] = '1' if track_info['explicit'] else '2'
+                tagger['explicittrack'] = 'true' if track_info['explicit'] else 'false'
 
         # Set genre from Deezer
         if 'genre' in track_info:
@@ -114,16 +115,16 @@ class Tagger(object):
 
         if track_type is None:
             if track_info['audioModes'] == ['DOLBY_ATMOS']:
-                tagger['quality'] = " [Dolby Atmos]"
+                tagger['quality'] = "Dolby Atmos (E-AC-3)"
             elif track_info['audioModes'] == ['SONY_360RA']:
-                tagger['quality'] = " [360]"
+                tagger['quality'] = "Sony 360 Reality Audio"
             elif track_info['audioQuality'] == 'HI_RES':
-                tagger['quality'] = " [M]"
+                tagger['quality'] = "Master Quality Authenticated"
             else:
-                tagger['quality'] = ""
+                tagger['quality'] = "[FLAC]"
 
             if 'explicit' in album_info:
-                tagger['explicit'] = ' [E]' if album_info['explicit'] else ''
+                tagger['explicit'] = 'Explicit' if album_info['explicit'] else 'Clean'
 
         return tagger
 
@@ -149,8 +150,8 @@ class Tagger(object):
                 print('\tSet "artwork_size" to a lower value in config/settings.py')
 
         # Set lyrics from Deezer
-        if lyrics:
-            tagger['lyrics'] = lyrics
+#        if lyrics:
+#            tagger['lyrics'] = lyrics
 
         tagger.save(file_path)
 
@@ -161,7 +162,7 @@ class Tagger(object):
             tagger.RegisterTextKey('isrc', '----:com.apple.itunes:ISRC')
             tagger.RegisterTextKey('upc', '----:com.apple.itunes:UPC')
             tagger.RegisterTextKey('explicit', 'rtng')
-            tagger.RegisterTextKey('lyrics', '\xa9lyr')
+#            tagger.RegisterTextKey('lyrics', '\xa9lyr')
 
             self._meta_tag(tagger, track_info, album_info, 'm4a')
             if self.fmtopts['embed_album_art'] and album_art_path is not None:
@@ -172,7 +173,7 @@ class Tagger(object):
                 tagger['covr'] = [pic]
 
             # Set lyrics from Deezer
-            if lyrics:
-                tagger['lyrics'] = lyrics
+#            if lyrics:
+#                tagger['lyrics'] = lyrics
 
             tagger.save(file_path)

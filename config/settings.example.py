@@ -79,7 +79,7 @@ PRESETS = {
         "uncompressed_artwork": True,
         "resolution": 1080,
         "MQA_FLAC_24": True,
-        "FLAC_16": True,
+        "FLAC_16": False,
         "AAC_320": False,
         "AAC_96": False
     },
@@ -88,25 +88,25 @@ PRESETS = {
     "best_available": {
         "keep_cover_jpg": False,
         "embed_album_art": True,
-        "save_album_json": False,
-        "aggressive_remix_filtering": True,
-        "skip_singles_when_possible": True,
-        "skip_360ra": True,
+        "save_album_json": True,
+        "aggressive_remix_filtering": False,
+        "skip_singles_when_possible": False,
+        "skip_360ra": False,
         "tries": 5,
         "path": path,
         "track_format": "{tracknumber} - {title}",
         "album_format": "{albumartist} - {album}{quality}{explicit}",
-        "convert_to_alac": True,
+        "convert_to_alac": False,
         "save_credits_txt": True,
         "lyrics": True,
         "lyrics_provider_order": ["Deezer", "musiXmatch"],
         "artwork_size": 3000,
         "uncompressed_artwork": True,
         "resolution": 1080,
-        "MQA_FLAC_24": True,
-        "FLAC_16": True,
-        "AAC_320": True,
-        "AAC_96": True
+        "MQA_FLAC_24": False,
+        "FLAC_16": False,
+        "AAC_320": False,
+        "AAC_96": False
     },
 
     # This preset will download every song from playlist inside a playlist folder

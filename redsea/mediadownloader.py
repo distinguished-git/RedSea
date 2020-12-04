@@ -29,6 +29,8 @@ def _mkdir_p(path):
     try:
         if not os.path.isdir(path):
             os.makedirs(path)
+
+
     except OSError as exc:
         if exc.errno == errno.EEXIST and os.path.isdir(path):
             pass
@@ -203,6 +205,7 @@ class MediaDownloader(object):
                 track_file = track_file[:250 - len(track_file)]
             track_file = re.sub(r'\.+$', '', track_file)
             _mkdir_p(album_location)
+            
             # Make multi disc directories
             if album_info['numberOfVolumes'] > 1:
                 disc_location = path.join(
@@ -249,10 +252,23 @@ class MediaDownloader(object):
             else:
                 ftype ='flac'
 
+            fixedpath = ""
             if album_info['numberOfVolumes'] > 1:
-                track_path = path.join(disc_location, track_file + '.' + ftype)
+                fixedpath = disc_location
             else:
-                track_path = path.join(album_location, track_file + '.' + ftype)
+                fixedpath = album_location
+
+            if manifest['codecs'] == "ac4":
+                fixedpath.replace("E-AC-3", "AC-4")
+
+            _mkdir_p(fixedpath)
+            track_path = path.join(fixedpath, track_file + '.' + ftype)
+
+            aipath = os.path.join(fixedpath, 'album.json')
+            if not path.isfile(aipath):
+                with open(aipath, 'w') as ai:
+                    json.dump(album_info, ai)
+                    ai.close()                
 
             if path.isfile(track_path) and not overwrite:
                 print('\tFile {} already exists, skipping.'.format(track_path))
@@ -409,7 +425,7 @@ class MediaDownloader(object):
                             track_credits = album_credits['items'][track_info['trackNumber']-1]['credits']
                             data = ''
                             for i in range(len(track_credits)):
-                                data += track_credits[i]['type'] + ': '
+                                data += track_credits[i]['type'] + '='
                                 contributors = track_credits[i]['contributors']
                                 for j in range(len(contributors)):
                                     if j != len(contributors) - 1:
