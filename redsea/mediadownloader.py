@@ -209,7 +209,7 @@ class MediaDownloader(object):
             # Make multi disc directories
             if album_info['numberOfVolumes'] > 1:
                 disc_location = album_location
-                track_file = f'{track_info['volumeNumber']}-{track_file}'
+                track_file = f"{track_info['volumeNumber']}-{track_file}"
 
             # Attempt to get stream URL
             # stream_data = self.get_stream_url(track_id, quality)
