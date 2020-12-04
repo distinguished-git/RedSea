@@ -30,17 +30,17 @@ butler
 
 for flac in *.flac
 do
-	bpm-tag "$flac"
+	nice bpm-tag "$flac"
 	TXTFILE="$(echo "$flac" | sed "s/\.flac/\.txt/")"
 	echo "checking for $TXTFILE"
 	if [ -e "$TXTFILE" ]
 	then
-	    metaflac --import-tags-from "$TXTFILE" "$flac"
+	    nice metaflac --import-tags-from "$TXTFILE" "$flac"
 	    rm -f $TXTFILE
 	fi
 done
 
-metaflac --add-replay-gain *.flac
+nice metaflac --add-replay-gain *.flac
 
 
 find "$(pwd)" -iname "*.flac" -o -iname "*.lrc" -o -iname "*.log" | sed -e "s/\/tmp\/ramdisk\/tidal\//\//" > include.txt
