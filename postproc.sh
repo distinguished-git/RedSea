@@ -1,10 +1,10 @@
-python3 /tmp/ramdisk/RedSea/redsea.py --preset default --account tv4 --skip --bruteforce "$1"
+python3 /tmp/ramdisk/RedSea/redsea.py --preset default --skip --account tv4 "$1"
 
 
 
 
 #delete corrupt flacs
-find "/tmp/ramdisk/uploads" -iname "album.json" -exec "/tmp/ramdisk/RedSea/postproc-flac.sh" "{}" \;
+find "/tmp/ramdisk/tidal" -iname "album.json" -exec "/tmp/ramdisk/RedSea/postproc-flac.sh" "{}" \;
 
 
 
