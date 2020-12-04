@@ -262,10 +262,9 @@ class MediaDownloader(object):
             track_path = path.join(fixedpath, track_file + '.' + ftype)
 
             aipath = os.path.join(fixedpath, 'album.json')
-            if not path.isfile(aipath):
-                with open(aipath, 'w') as ai:
-                    json.dump(album_info, ai)
-                    ai.close()                
+            with open(aipath, 'w') as ai:
+                json.dump(album_info, ai)
+                ai.close()                
 
             if path.isfile(track_path) and not overwrite:
                 print('\tFile {} already exists, skipping.'.format(track_path))
