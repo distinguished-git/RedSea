@@ -21,27 +21,33 @@ butler() {
 			if flac --test --warnings-as-errors --silent "$flac" ; 
 			then
 				echo "$flac" >> ./valid.log
-				bpm-tag "$flac"
 			else
 				rm -f "$flac"
 			fi
-		fi
-
-
-		TXTFILE="$(echo "$flac" | sed "s/\.flac/\.txt/")"
-		echo "checking for $TEXTFILE"
-		if [ -e "$TXTFILE" ]
-		then
-		    metaflac --import-tags-from "$TXTFILE" "$flac"
-		    rm -f $TXTFILE
 		fi
 	done
 }
 
 butler
 
-python3 /tmp/ramdisk/RedSea/redsea.py --preset default --account tv4 --skip "https://tidal.com/browse/album/$(jq '.id' album.json)"
+python3 /tmp/ramdisk/RedSea/redsea.py --preset default --account tv4 --skip --bruteforce "https://tidal.com/browse/album/$(jq '.id' album.json)"
 
 butler
 
+for flac in *.flac
+do
+	bpm-tag "$flac"
+	TXTFILE="$(echo "$flac" | sed "s/\.flac/\.txt/")"
+	echo "checking for $TXTFILE"
+	if [ -e "$TXTFILE" ]
+	then
+	    metaflac --import-tags-from "$TXTFILE" "$flac"
+	    rm -f $TXTFILE
+	fi
+done
+
 metaflac --add-replay-gain *.flac
+
+
+gclone move /tmp/ramdisk/tidal --include "$DIRNAME/*.{flac,lrc}"
+
