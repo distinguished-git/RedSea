@@ -7,7 +7,7 @@ import re
 import base64
 import ffmpeg
 import binascii
-import shutil 
+import shutil
 import platform
 import subprocess
 
@@ -209,7 +209,7 @@ class MediaDownloader(object):
         track_file = track_file[:250 - len(track_file)]
       track_file = re.sub(r'\.+$', '', track_file)
       _mkdir_p(album_location)
-      
+
       # Make multi disc directories
       if album_info['numberOfVolumes'] > 1:
         disc_location = album_location
@@ -218,12 +218,12 @@ class MediaDownloader(object):
       # Attempt to get stream URL
       # stream_data = self.get_stream_url(track_id, quality)
 
-      DRM = False 
-      playback_info = self.api.get_stream_url(track_id, preset['quality'])          
-        
+      DRM = False
+      playback_info = self.api.get_stream_url(track_id, preset['quality'])
+
       manifest_unparsed = base64.b64decode(playback_info['manifest']).decode('UTF-8')
       if 'ContentProtection' in manifest_unparsed:
-        DRM = True 
+        DRM = True
         print("\tWarning: DRM has been detected. If you do not have the decryption key, do not use web login.")
       elif 'manifestMimeType' in playback_info:
         if playback_info['manifestMimeType'] == 'application/dash+xml':
@@ -231,7 +231,7 @@ class MediaDownloader(object):
                      + ' in ' + str(playback_info['audioQuality']) + ' audio quality. This cannot '
                                              'be downloaded with a TV '
                                              'session for now.\n')
-        
+
       if not DRM:
         manifest = json.loads(manifest_unparsed)
         # Detect codec
@@ -269,7 +269,7 @@ class MediaDownloader(object):
       aipath = os.path.join(fixedpath, 'album.json')
       with open(aipath, 'w') as ai:
         json.dump(album_info, ai)
-        ai.close()                
+        ai.close()
 
       if path.isfile(track_path) or path.isfile(track_path_secondary):
         if not overwrite:
@@ -295,7 +295,7 @@ class MediaDownloader(object):
         length = int(pattern.findall(manifest)[0]) + 3
 
         # Download all chunk files from MPD
-        with open(album_location + '/encrypted.mp4','wb') as encrypted_file:    
+        with open(album_location + '/encrypted.mp4','wb') as encrypted_file:
           for i in range(length):
             link = playback_link.replace("$Number$", str(i))
             filename = os.path.join(tmp_folder, str(i).zfill(3) + '.mp4')
@@ -419,7 +419,7 @@ class MediaDownloader(object):
             ftype = "m4a"
 
         # Get credits from album id
-'''        print('\tSaving credits to file')
+        print('\tSaving credits to file')
         album_credits = self.credits_from_album(str(album_info['id']))
         credits_dict = {}
         try:
@@ -432,6 +432,7 @@ class MediaDownloader(object):
                 credits_dict[track_credits[i]['type']] += contributors[j]['name'] + ', '
               else:
                 credits_dict[track_credits[i]['type']] += contributors[j]['name']
+
           if credits_dict != {}:
             if 'save_credits_txt' in preset:
               if preset['save_credits_txt']:
@@ -439,24 +440,6 @@ class MediaDownloader(object):
                 for key, value in credits_dict.items():
                   data += key + ': '
                   data += value + '\n'
-'''
-                if 'save_credits_txt' in preset:
-                    if preset['save_credits_txt']:
-                        print('\tSaving credits to file')
-                        album_credits = self.credits_from_album(str(album_info['id']))
-                        try:
-                            track_credits = album_credits['items'][track_info['trackNumber']-1]['credits']
-                            data = ''
-                            for i in range(len(track_credits)):
-                                data += track_credits[i]['type'] + '='
-                                contributors = track_credits[i]['contributors']
-                                for j in range(len(contributors)):
-                                    if j != len(contributors) - 1:
-                                        data += contributors[j]['name'] + ', '
-                                    else:
-                                        data += contributors[j]['name'] + '\n'
-
-                            if data != '':
                 with open((os.path.splitext(track_path)[0] + '.txt'), 'w') as f:
                   f.write(data)
             # Janky way to set the dict to None to tell the tagger not to include it
