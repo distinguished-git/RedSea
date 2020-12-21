@@ -1,3 +1,4 @@
+import time
 import errno
 import json
 import os
@@ -418,7 +419,7 @@ class MediaDownloader(object):
             ftype = "m4a"
 
         # Get credits from album id
-        print('\tSaving credits to file')
+'''        print('\tSaving credits to file')
         album_credits = self.credits_from_album(str(album_info['id']))
         credits_dict = {}
         try:
@@ -431,7 +432,6 @@ class MediaDownloader(object):
                 credits_dict[track_credits[i]['type']] += contributors[j]['name'] + ', '
               else:
                 credits_dict[track_credits[i]['type']] += contributors[j]['name']
-
           if credits_dict != {}:
             if 'save_credits_txt' in preset:
               if preset['save_credits_txt']:
@@ -439,6 +439,24 @@ class MediaDownloader(object):
                 for key, value in credits_dict.items():
                   data += key + ': '
                   data += value + '\n'
+'''
+                if 'save_credits_txt' in preset:
+                    if preset['save_credits_txt']:
+                        print('\tSaving credits to file')
+                        album_credits = self.credits_from_album(str(album_info['id']))
+                        try:
+                            track_credits = album_credits['items'][track_info['trackNumber']-1]['credits']
+                            data = ''
+                            for i in range(len(track_credits)):
+                                data += track_credits[i]['type'] + '='
+                                contributors = track_credits[i]['contributors']
+                                for j in range(len(contributors)):
+                                    if j != len(contributors) - 1:
+                                        data += contributors[j]['name'] + ', '
+                                    else:
+                                        data += contributors[j]['name'] + '\n'
+
+                            if data != '':
                 with open((os.path.splitext(track_path)[0] + '.txt'), 'w') as f:
                   f.write(data)
             # Janky way to set the dict to None to tell the tagger not to include it
