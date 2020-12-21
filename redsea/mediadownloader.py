@@ -263,15 +263,15 @@ class MediaDownloader(object):
 
       _mkdir_p(fixedpath)
       track_path = path.join(fixedpath, track_file + '.' + ftype)
-      track_path_secondary = path.join(fixedpath.replace(self.opts['path'], self.opts['path_secondary']), track_file + '.' + ftype)
+      track_path_secondary = path.join(fixedpath.replace(self.opts['path'], '/cygdrive/r/Music'), track_file + '.' + ftype)
 
       aipath = os.path.join(fixedpath, 'album.json')
       with open(aipath, 'w') as ai:
         json.dump(album_info, ai)
         ai.close()                
 
-      if path.isfile(track_path) and not overwrite:
-        if path.isfile(track_path_secondary) and not overwrite:
+      if path.isfile(track_path) or path.isfile(track_path_secondary):
+        if not overwrite:
           print('\tFile {} already exists, skipping.'.format(track_path))
           return None
 
@@ -556,7 +556,12 @@ class MediaDownloader(object):
         print('\tTagging media file...')
 
         if ftype == 'flac':
-          self.tm.tag_flac(temp_file, track_info, album_info, lyrics, credits_dict, aa_location)
+          for x in range(0, 60):
+            time.sleep(1 * (x / 10))
+            try:
+              self.tm.tag_flac(temp_file, track_info, album_info, lyrics, credits_dict, aa_location)
+            except:
+              pass
         elif ftype == 'm4a' or ftype == 'mp4':
           self.tm.tag_m4a(temp_file, track_info, album_info, lyrics, aa_location)
         else:
