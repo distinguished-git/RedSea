@@ -131,7 +131,7 @@ class Tagger(object):
     def _meta_tag(self, tagger, track_info, album_info, track_type):
         self.tags(track_info, track_type, album_info, tagger)
 
-    def tag_flac(self, file_path, track_info, album_info, lyrics, album_art_path=None):
+    def tag_flac(self, file_path, track_info, album_info, lyrics, credits_dict=None, album_art_path=None):
         tagger = FLAC(file_path)
 
         self._meta_tag(tagger, track_info, album_info, 'flac')
@@ -152,6 +152,12 @@ class Tagger(object):
         # Set lyrics from Deezer
 #        if lyrics:
 #            tagger['lyrics'] = lyrics
+
+        if credits_dict:
+            for key, value in credits_dict.items():
+                contributors = value.split(', ')
+                for con in contributors:
+                    tagger.tags.append((key, con))
 
         tagger.save(file_path)
 

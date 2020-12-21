@@ -1,7 +1,8 @@
 cat albums2.txt | while read line 
 do
-	python3 /tmp/ramdisk/RedSea/redsea.py --preset default --skip --account tv5 "$1"
-	find "/tmp/ramdisk/tidal" -cmin +10 -iname "album.json" -exec "/tmp/ramdisk/RedSea/postproc-flac.sh" "{}" \;
+#	python3 /tmp/ramdisk/RedSea/redsea.py --preset default --skip --account tv5 "$1"
+	python3 redsea.py --preset default --skip --account tv5 "$1"
+	#	find "/tmp/ramdisk/tidal" -cmin +10 -iname "album.json" -exec "/tmp/ramdisk/RedSea/postproc-flac.sh" "{}" \;
 done
 
 
