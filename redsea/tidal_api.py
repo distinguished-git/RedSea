@@ -1058,6 +1058,9 @@ class TidalSessionFile(object):
                 self.sessions[session_name].refresh()
             assert self.sessions[session_name].valid(), '{} has an invalid sessionId. Please re-authenticate'.format(
                 session_name)
+
+            self._save()
+            
             return self.sessions[session_name]
 
         raise ValueError('Session "{}" could not be found.'.format(session_name))
